@@ -2006,8 +2006,8 @@ const menuButton = {
                 $("body").append(menu);
                 $menuButton = $("#" + menuButtonId).width(140);
                 _this.focus($menuButton, "clip");
-                //点击换行方式时触发
-                $menuButton.find(".luckysheet-cols-menuitem").click(function() {
+                //hz_tag 点击换行方式时触发
+                // $menuButton.find(".luckysheet-cols-menuitem").click(function() {
 
                 $menuButton.find(".luckysheet-cols-menuitem").click(function() { // 处理自动换行
                     $menuButton.hide();
