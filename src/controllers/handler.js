@@ -6045,7 +6045,7 @@ export default function luckysheetHandler() {
             }
 
             const locale_fontjson = locale().fontjson;
-            debugger;
+            // debugger;
             // hook
             if (!method.createHookFunction("rangePasteBefore", Store.luckysheet_select_save, txtdata)) {
                 return;

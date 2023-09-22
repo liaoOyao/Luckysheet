@@ -376,6 +376,8 @@ export function convertSpanToShareString($dom){
 }
 
 export function convertCssToStyleList(cssText){
+    // hz_tag
+    // 特殊规则：默认字体为微软雅黑 14px,确不设置其他的字体样式
     if(cssText==null || cssText.length==0){
         return {};
     }
@@ -386,13 +388,16 @@ export function convertCssToStyleList(cssText){
     const locale_fontarray = _locale.fontarray;
     const locale_fontjson = _locale.fontjson;
     let styleList = {    
-        "ff":locale_fontarray[0], //font family
-        "fc":"#000000",//font color
-        "fs":10,//font size
-        "cl":0,//strike
-        "un":0,//underline
-        "bl":0,//blod
-        "it":0,//italic
+        // hz_tag：取消默认的stylelist 设置
+        // "ff":locale_fontarray[0], //font family
+        "ff": 4,    // hz_tag 默认为微软雅黑
+        // "fc":"#000000",//font color
+        // "fs":10,//font size
+        "fs": 12,    // hz_tag 默认为12px
+        // "cl":0,//strike
+        // "un":0,//underline
+        // "bl":0,//blod
+        // "it":0,//italic
     };
     cssTextArray.forEach(s => {
         s = s.toLowerCase();

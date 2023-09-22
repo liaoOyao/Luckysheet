@@ -43,7 +43,7 @@ function chart(options, config, isDemo) {
 
     seriesLoadScripts(dependScripts, null, function() {
         const store = new Vuex.Store();
-        console.info("chartmix::", chartmix.default);
+        // console.info("chartmix::", chartmix.default);
 
         Vue.use(chartmix.default, { store });
         let outDom = document.getElementsByTagName("body")[0];

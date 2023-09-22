@@ -65,11 +65,11 @@
 
 		$(function () {
 			function handle_range(range) {
-				debugger;
+				// debugger;
 				try {
 					if (range) {
 						if (range.type === 'datachange') {//数据改变  luckyhsheet 目前只支持一次性改变连续的表格区间的  数据
-							debugger;
+							// debugger;
 							let updated_obj = {
 								"sheetIndex": range.sheetIndex, //sheet 索引
 								"type": range.type, //变更类型
@@ -500,7 +500,7 @@
 							return false;
 						},
 						cellDeleteBefore: function (r, c, value) {
-							debugger;
+							// debugger;
 							console.info(r, c, value)
 							return false;
 						},
