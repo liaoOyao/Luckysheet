@@ -1300,6 +1300,13 @@ const luckysheetformula = {
             });
     },
     updatecell: function(r, c, value, isRefresh = true) {
+        // hz_tag
+        // 备注说明：
+        //     - 执行修改操作的函数。经检查，添加换行后，该函数内会在单元格的ct.s 中设置默认的字体格式！
+        //       具体地，会在 convertSpanToShareString 时执行该操作
+        //
+        // hz 添加的特殊操作：
+        // 1.（lh - 20230922）取消编辑后单元格高度自适应
         let _this = this;
 
         let $input = $("#luckysheet-rich-text-editor");
@@ -1628,8 +1635,11 @@ const luckysheetformula = {
 
         // 单元格行高自适应,只有在单元格不是合并单元格时才能生效
         if (
-            (d[r][c].tb == "2" && d[r][c].v != null) ||
-            (isInlineStringCell(d[r][c]) && typeof d[r][c]["mc"] == "undefined")
+            // hz_tag 取消单元格行高自适应（如需恢复，删除 ==范围内==的代码即可） == 
+            false &&
+            // ==
+            ((d[r][c].tb == "2" && d[r][c].v != null) ||
+            (isInlineStringCell(d[r][c]) && typeof d[r][c]["mc"] == "undefined"))
         ) {
             //自动换行
             let defaultrowlen = Store.defaultrowlen;

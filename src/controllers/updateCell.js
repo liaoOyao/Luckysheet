@@ -19,6 +19,29 @@ import server from './server';
 import method from '../global/method';
 
 export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocus) {
+    // hz_tag 
+    // 渲染编辑输入框input的函数！！
+    // 20230922：以下流程梳理是在误以为该函数是执行更新的函数时进行的总结。仍然可以用作
+    //           参考，但未完成部分不会继续更新
+
+    // 流程总结（如无特殊说明一下步骤均为luckysheet官方自带的步骤）：
+    //    1.检查是否锁定 checkProtectionLocked
+    //    2.检查编辑模式
+    //    3.钩子函数 cellEditBefore
+    //    4.编辑单元格时发送指令到后台，通知其他单元格更新为“正在输入”状态 server.saveParam
+    //    5.数据验证（检查可能设置的数据）
+    //    6.获取 size 与 row对象
+    //    7.隐藏 #luckysheet-dropCell-icon
+    //    8.获取相关变量
+    //    9.pivotTable.isPivotRange
+    //    10.计算真实位置？（根据冻结信息和offset相关设置）
+    //    11.获取input 位置，计算input内容的尺寸
+    //    12.缓存更新了的cell的位置信息（行列信息），矫正选中状态（如未选中则设置focus 与 select）
+    //    13.如存在行和单元格，则开始执行修改操作
+    //        - input_postition
+    //    14.
+    //    15.
+    //    16.
     if(!checkProtectionLocked(row_index1, col_index1, Store.currentSheetIndex)){
         $("#luckysheet-functionbox-cell").blur();
         return;
@@ -45,6 +68,7 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
         }
     }
 
+    // 获取 size 与 row对象
     let size = getColumnAndRowSize(row_index1, col_index1, d);
     let row = size.row, 
         row_pre = size.row_pre, 
@@ -52,20 +76,22 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
         col_pre = size.col_pre, 
         row_index = size.row_index, 
         col_index = size.col_index;
-
+    // 隐藏 #luckysheet-dropCell-icon
     if($("#luckysheet-dropCell-icon").is(":visible")){
         $("#luckysheet-dropCell-icon").remove();
     }
 
+    // 获取相关变量
     let winH = $(window).height(), winW = $(window).width();
     let container_offset = $("#" + Store.container).offset();
     let scrollLeft = $("#luckysheet-cell-main").scrollLeft();
     let scrollTop = $("#luckysheet-cell-main").scrollTop();
-
+    
     if (pivotTable.isPivotRange(row_index, col_index)) {
         return;
     }
 
+    // 计算真实位置？（根据冻结信息和offset相关设置）
     let left = col_pre + container_offset.left + Store.rowHeaderWidth - scrollLeft - 2;
     if(luckysheetFreezen.freezenverticaldata != null && col_index1 <= luckysheetFreezen.freezenverticaldata[1]){
         left = col_pre + container_offset.left + Store.rowHeaderWidth - 2;
@@ -76,6 +102,7 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
         top = row_pre + container_offset.top + Store.infobarHeight + Store.toolbarHeight + Store.calculatebarHeight + Store.columnHeaderHeight - 2;
     }
 
+    // 获取input 位置，计算input内容的尺寸
     let input_postition = {
         "min-width": col - col_pre+ 1- 8, 
         "min-height": row - row_pre + 1- 4,  
@@ -93,6 +120,7 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
         "height":(100 / Store.zoomRatio) + "%",
     }
 
+    // 缓存更新了的cell的位置信息（行列信息），矫正选中状态（如未选中则设置focus 与 select）与相关样式
     Store.luckysheetCellUpdate = [row_index, col_index];
     if (!isnotfocus) {
         $("#luckysheet-rich-text-editor").focus().select();
@@ -117,6 +145,7 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
     
     let value = "", isCenter=false;
     
+    // 如存在行和单元格，则开始执行后续操作
     if (d[row_index] != null && d[row_index][col_index] != null) {
         let cell = d[row_index][col_index];
         let htValue = cell["ht"];
@@ -206,6 +235,7 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
         }
     }
 
+    // 矫正宽
     if(input_postition["min-height"] > input_postition["max-height"]){
         input_postition["min-height"] = input_postition["max-height"];
     }
@@ -229,6 +259,7 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
         }
     }
 
+    // 根据其他配置矫正样式 input_postition inputContentScale
     if(isCenter){
         let width = $("#luckysheet-input-box").width();
         if(width> input_postition["max-width"]){

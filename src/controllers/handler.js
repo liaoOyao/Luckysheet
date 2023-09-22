@@ -5933,6 +5933,17 @@ export default function luckysheetHandler() {
 
     //粘贴事件处理
     $(document).on("paste.luckysheetEvent", function(e) {
+        // hz_tag
+        // 变量备注：
+        // cpDataArr
+        // clipboardData    window中的粘贴板数据
+        // txtdata          clipboardData 中的文本数据
+        // locale_fontjson    字体名字与编号的映射对象，如：  "微软雅黑": 4
+        // data  ？ 最终复制的数据
+        // 
+        // hz 添加的特殊操作：
+        // 1.（lh - 20230922）z粘贴时保留换行符
+
         if (isEditMode()) {
             //此模式下禁用粘贴
             return;
@@ -6045,7 +6056,7 @@ export default function luckysheetHandler() {
             }
 
             const locale_fontjson = locale().fontjson;
-            debugger;
+            // debugger;
             // hook
             if (!method.createHookFunction("rangePasteBefore", Store.luckysheet_select_save, txtdata)) {
                 return;
@@ -6105,7 +6116,13 @@ export default function luckysheetHandler() {
                                     cell.v = null;
                                     cell.m = "";
                                 } else {
-                                    let mask = genarate($td.text());
+                                    // hz_tag 保留换行符
+                                    let _html = $td.html().replace(/<br>/g, '\n') +'';
+                                    let _div_temp = $(`<div>${_html}</div>`)
+                                    let _text = _div_temp.text()
+                                    // let mask = genarate($td.text());
+                                    let mask = genarate(_text);
+
                                     cell.v = mask[2];
                                     cell.ct = mask[1];
                                     cell.m = mask[0];
