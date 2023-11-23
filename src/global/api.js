@@ -232,7 +232,8 @@ export function setCellValue(row, column, value, options = {}) {
             setcellvalue(row, column, data, value);
         }
     }
-
+    //   最关键的一行代码修改 修改Store.flowdata中的数据，公式生效
+     Store.flowdata[row][column] = data[row][column];
     /* cell更新后触发  */
     setTimeout(() => {
         let oldValueObj
@@ -1831,6 +1832,7 @@ export function getRangeValue(options = {}) {
  * @param {order} options.order 工作表下标
  */
 export function getRangeHtml(options = {}) {
+    // debugger;
     let {
         range = Store.luckysheet_select_save,
         order = getSheetIndex(Store.currentSheetIndex),

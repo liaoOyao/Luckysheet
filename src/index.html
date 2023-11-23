@@ -24,15 +24,18 @@
 
 		<div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:80%;height:500px;left: 20%;top: 200px;bottom:0;right: 0;"></div>
 	</div> -->
-
+	<div style="position: fixed;width: 10px;height: 10px;z-index: 999999999999999999999999999999;left:calc(50% - 80px)">
+			<button onclick="get_and_copy_data" id="copy_data_btn" style="width: 48px;height: 48px;z-index: 999999999999999999999999999999;
+		">复制数据</button>
+	</div>
 	<div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:100%;height:100%;left: 0px;top: 0px;">
 	</div>
 
-	<div style="position:absolute;margin-top: 500px;height: 20px">
+	<!-- <div style="position:absolute;margin-top: 500px;height: 20px">
 		<button id="myButton" @click="get_data()">点击我</button>
 		<button id="myButton2" @click="clear()">清空</button>
 		<div id="infoDiv" style="position:absolute;min-height: 300px;overflow: auto"></div>
-	</div>
+	</div> -->
 	<!-- demo feature, non-production use -->
 	<script src="./demoData/demoFeature.js"></script>
 	<script src="./demoData/sheetFormula.js"></script>
@@ -47,6 +50,8 @@
 	<script src="./demoData/sheetPicture.js"></script>
 	<script src="./demoData/sheetDataVerification.js"></script>
 	<script src="./demoData/hj_data.js"></script>
+	<script src="./demoData/huanhang.js"></script>
+	<script src="./demoData/duohang.js"></script>
 
 
 	<script>
@@ -61,15 +66,18 @@
 		// import sheetChart from './demoData/sheetChart.js'
 		// import sheetPicture from './demoData/sheetPicture.js'
 		// import sheetDataVerification from './demoData/sheetDataVerification.js'
-
-
+		function get_and_copy_data() {
+			const data = luckysheet.getluckysheetfile();
+				//  将数据复制到剪切板
+				 navigator.clipboard.writeText(JSON.stringify(data));
+				 alert("复制成功");
+	}
 		$(function () {
+			
 			function handle_range(range) {
-				// debugger;
 				try {
 					if (range) {
 						if (range.type === 'datachange') {//数据改变  luckyhsheet 目前只支持一次性改变连续的表格区间的  数据
-							// debugger;
 							let updated_obj = {
 								"sheetIndex": range.sheetIndex, //sheet 索引
 								"type": range.type, //变更类型
@@ -368,8 +376,11 @@
 			var isShare = luckysheetDemoUtil.getRequest().share; // '?share=1' opens the collaborative editing mode
 			var gridKey = luckysheetDemoUtil.getRequest().gridKey; // workbook id for collaborative editing, or directly define here
 			var options = null;
+			// gridKey = 'sdt_tk_1_2';
 
 			if (isShare || gridKey) {
+				// debugger;
+			// if (true || gridKey) {
 				// http://localhost:3000/?gridKey=12eyy789-kk45ofid-23737245
 				if (!gridKey) {
 					alert('If gridKey is not provided in the address bar, please add it in the source code')
@@ -378,17 +389,21 @@
 					container: "luckysheet",
 					lang: 'zh',
 					allowUpdate: true,
-					updateImageUrl: location.origin + "/luckysheet/api/updateImg",
+					// updateImageUrl: location.origin + "/luckysheet/api/updateImg",
+					// updateUrl:  "ws://" +location.origin + "/ws/primary_data/hiwin_excel",
+					
 					updateUrl: "ws://" + location.host + "/luckysheet/websocket/luckysheet",
 					gridKey: gridKey,
 					loadUrl: location.origin + "/luckysheet/api/load",
-					loadSheetUrl: location.origin + "/luckysheet/api/loadsheet"
+					loadUrl:"http://127.0.0.1:8088/primary_data/hiwin_excel?method=get_template&dimension=C_sdt_tk_1_2_00000000_null_null_null&year=2022&sp_index=11"
+					// loadSheetUrl: location.origin + "/luckysheet/api/loadsheet",
+					
 				}
 			} else {
 				// http://localhost:3000/
 				options = {
 					container: 'luckysheet',
-					lang: lang,
+					lang: 'zh',
 					// pager: {
 					// 	pageIndex: 1,
 					// 	pageSize: 10,
@@ -396,6 +411,7 @@
 					// 	selectOption: [10, 20]
 					// },
 					forceCalculation: false,
+					show_select_count:false,
 					plugins: [{ name: 'chart' }, { name: 'exportXlsx', config: { url: 'http://localhost:3002/luckyToXlsx' } }, {
 						name: 'print', config: {
 							license: ''
@@ -500,7 +516,6 @@
 							return false;
 						},
 						cellDeleteBefore: function (r, c, value) {
-							// debugger;
 							console.info(r, c, value)
 							return false;
 						},
@@ -512,7 +527,7 @@
 					// data:
 					// 	[sheetCell, sheetFormula, sheetConditionFormat, sheetSparkline, sheetTable, sheetComment, sheetPivotTableData, sheetPivotTable, sheetChart, sheetPicture, sheetDataVerification]
 					data:
-						[hj_data]
+						[huanhang, duohang]
 					/*data:[{
 					"name": "Cell",
 					"config": {
@@ -2247,8 +2262,8 @@
 				infoDiv.innerHTML = "";
 			}
 			// 绑定按钮点击事件
-			document.getElementById("myButton").addEventListener("click", get_data);
-			document.getElementById("myButton2").addEventListener("click", clear);
+			// document.getElementById("myButton").addEventListener("click", get_data);
+			document.getElementById("copy_data_btn").addEventListener("click", get_and_copy_data);
 		})
 	</script>
 	<style>

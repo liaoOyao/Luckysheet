@@ -39,6 +39,7 @@ const luckysheetConfigsetting = {
 
     defaultTextColor: '#000',
     defaultCellColor: '#fff',
+    show_select_count: true,
 }
 
 export default luckysheetConfigsetting;

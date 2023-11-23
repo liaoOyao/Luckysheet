@@ -9,7 +9,7 @@ import Store from '../store';
 import method from '../global/method';
 import locale from '../locale/locale';
 import { refreshMenuButtonFocus } from "../global/api";
-
+import luckysheetConfigsetting from "./luckysheetConfigsetting";
 //公式函数 选区实体框
 function seletedHighlistByindex(id, r1, r2, c1, c2) {
     let row = Store.visibledatarow[r2],
@@ -155,15 +155,17 @@ function selectHightlightShow(isRestore = false) {
                     "height": Store.luckysheet_select_save[i]["height"],
                     "display": "block"
                 });
-                //行列数
-                luckysheet_count_show(
-                    Store.luckysheet_select_save[i]["left_move"],
-                    Store.luckysheet_select_save[i]["top_move"],
-                    Store.luckysheet_select_save[i]["width_move"],
-                    Store.luckysheet_select_save[i]["height_move"],
-                    [r1, r2],
-                    [c1, c2]
-                );
+                if (luckysheetConfigsetting.show_select_count) {
+                    //   行列数 hz-flag 取消显示行数列数
+                    luckysheet_count_show(
+                        Store.luckysheet_select_save[i]["left_move"],
+                        Store.luckysheet_select_save[i]["top_move"],
+                        Store.luckysheet_select_save[i]["width_move"],
+                        Store.luckysheet_select_save[i]["height_move"],
+                        [r1, r2],
+                        [c1, c2]
+                    );
+                }
                 //左上角选择区域框
                 formula.fucntionboxshow(rf, cf);
                 //focus单元格数据验证

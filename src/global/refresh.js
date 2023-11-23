@@ -60,6 +60,7 @@ function jfrefreshgrid(data, range, allParam, isRunExecFunction = true, isRefres
     let dataVerification = allParam["dataVerification"];  //数据验证
     let dynamicArray = allParam["dynamicArray"];  //动态数组
     let hyperlink = allParam["hyperlink"];
+    let back = JSON.parse(JSON.stringify(allParam["back"] ||false));
 
     let file = Store.luckysheetfile[getSheetIndex(Store.currentSheetIndex)];
 
@@ -99,6 +100,7 @@ function jfrefreshgrid(data, range, allParam, isRunExecFunction = true, isRefres
         }
         
         Store.jfredo.push({ 
+            "back":Store.back,
             "type": "datachange", 
             "data": Store.flowdata, 
             "curdata": data,
@@ -120,8 +122,6 @@ function jfrefreshgrid(data, range, allParam, isRunExecFunction = true, isRefres
             "dataRange": [...file.luckysheet_select_save]// 保留操作时的选区
         });
     }
-
-    //Store.flowdata
     Store.flowdata = data;
     editor.webWorkerFlowDataCache(Store.flowdata);//worker存数据
     file.data = Store.flowdata;
@@ -291,7 +291,6 @@ function jfrefreshgridall(colwidth, rowheight, data, cfg, range, ctrlType, ctrlV
             server.historyParam(data, Store.currentSheetIndex, range[s]);    
         }
     }
-
     if (Store.clearjfundo) {
         Store.jfundo.length  = 0;
 

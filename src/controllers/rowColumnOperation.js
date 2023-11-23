@@ -2281,7 +2281,6 @@ export function rowColumnOperationInitial() {
             const file_data = file?file.data:null;
             const file_cell_data = file?file.celldata:null;
             for (let s = 0; s < Store.luckysheet_select_save.length; s++) {
-                // debugger;
                 let r1 = Store.luckysheet_select_save[s].row[0],
                     r2 = Store.luckysheet_select_save[s].row[1];
                 let c1 = Store.luckysheet_select_save[s].column[0],
@@ -2294,7 +2293,6 @@ export function rowColumnOperationInitial() {
                         }
                             // 添加钩子函数
                         // if (!method.createHookFunction("cellDeleteBefore", r, c, file_data[r][c], file_cell_data[r][c])) {
-                        //     debugger;
                         //     console.log("retun啦");
                         //     alert("retun啦");
                         //     return;

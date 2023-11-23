@@ -77,7 +77,6 @@ const controlHistory = {
         if (ctr.type == "datachange") {
             //如果有单元格为null,则对应公式应该删除
             formulaHistoryHanddler(ctr);
-            
             let allParam = {
                 "cfg": ctr.config,
                 "RowlChange": ctr.RowlChange,
@@ -436,7 +435,8 @@ const controlHistory = {
         Store.clearjfundo = true;
 
         // 撤销的时候curdata 跟 data 数据要调换一下
-        let newCtr = {...ctr, ...{data: ctr.curdata, curdata: ctr.data}}
+
+        let newCtr = {...ctr, back:true,...{data: ctr.curdata, curdata: ctr.data}}
         // 钩子函数
         method.createHookFunction('updated', newCtr)
         
@@ -456,7 +456,6 @@ const controlHistory = {
 
         if (ctr.type == "datachange") {
             formula.execFunctionGroup();
-
             let allParam = {
                 "cfg": ctr.curConfig,
                 "RowlChange": ctr.RowlChange,
@@ -464,6 +463,7 @@ const controlHistory = {
                 "dataVerification": ctr.curDataVerification,
                 "dynamicArray": ctr.curDynamicArray,
                 "hyperlink": ctr.curHyperlink,
+                "back":ctr.back,
             }
 
             formulaHistoryHanddler(ctr, "undo");

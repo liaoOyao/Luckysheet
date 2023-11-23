@@ -18,7 +18,8 @@ import locale from "../locale/locale";
 import imageCtrl from "./imageCtrl";
 
 const selection = {
-    clearcopy: function(e) {
+    clearcopy: function(e) {  // 双击单元格触发
+        // debugger;
         let clipboardData = window.clipboardData; //for IE
         if (!clipboardData) {
             // for chrome
@@ -90,7 +91,7 @@ const selection = {
 
         return style + color + ";";
     },
-    copy: function(e) {
+    copy: function(e) {  // hz-tag 复制
         //copy事件
         let clipboardData = window.clipboardData; //for IE
         if (!clipboardData) {
@@ -226,6 +227,7 @@ const selection = {
                     }
 
                     style += menuButton.getStyleByCell(d, r, c);
+                    // debugger;
 
                     if (getObjType(d[r][c]) == "object" && "mc" in d[r][c]) {
                         if ("rs" in d[r][c]["mc"]) {
@@ -454,9 +456,11 @@ const selection = {
                     if (c_value == null) {
                         c_value = getcellvalue(r, c, d);
                     }
+                    // debugger;
                     if (c_value == null && d[r][c] && d[r][c].ct && d[r][c].ct.t == "inlineStr") {
                         c_value = d[r][c].ct.s
                             .map((val) => {
+                                // debugger;
                                 const brDom = $('<br style="mso-data-placement:same-cell;">');
                                 const splitValue = val.v.split("\r\n");
                                 return splitValue
@@ -603,7 +607,8 @@ const selection = {
         }
     },
     isPasteAction: false,
-    paste: function(e, triggerType) {
+    paste: function(e, triggerType) {  // 粘贴事件 hz_flag
+        // debugger;
         //paste事件
         let _this = this;
 
@@ -647,7 +652,7 @@ const selection = {
             }
         }, 10);
     },
-    pasteHandler: function(data, borderInfo) {
+    pasteHandler: function(data, borderInfo, rowlen, columnlen) {  // 行高和列宽
         if (!checkProtectionLockedRangeList(Store.luckysheet_select_save, Store.currentSheetIndex)) {
             return;
         }
@@ -721,12 +726,28 @@ const selection = {
             if (addr > 0 || addc > 0) {
                 d = datagridgrowth([].concat(d), addr, addc, true);
             }
-
+            
+    
             if (cfg["rowlen"] == null) {
                 cfg["rowlen"] = {};
             }
-
             let RowlChange = false;
+            let CollChange = false;
+            // hz_flag 
+            if (cfg["rowlen"] == null) {
+                cfg["rowlen"] = {};
+            }
+            if (cfg["columnlen"] == null) {
+                cfg["columnlen"] = {};
+            }
+            if (JSON.stringify(rowlen).length > 2) {
+                RowlChange = true;
+            }
+
+            if (JSON.stringify(columnlen).length > 2) {
+                cfg["columnlen"] = {};
+                CollChange = true;
+            }
             let offsetMC = {};
             for (let h = minh; h <= maxh; h++) {
                 let x = [].concat(d[h]);
@@ -788,7 +809,7 @@ const selection = {
 
                     let fontset = luckysheetfontformat(x[c]);
                     let oneLineTextHeight = menuButton.getTextSize("田", fontset)[1];
-                    //比较计算高度和当前高度取最大高度
+                    //比较计算高度和当前高度取最大高度 hz-flag
                     if (oneLineTextHeight > currentRowLen) {
                         currentRowLen = oneLineTextHeight;
                         RowlChange = true;

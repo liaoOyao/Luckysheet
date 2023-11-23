@@ -167,7 +167,7 @@ const Store = {
         v: ''
     },
     conditionFormatCells: {}, // 条件格式高亮的单元格
-
+    'back':false,// 标识本次datachange 类型是否为撤销
 }
 
 export default Store;

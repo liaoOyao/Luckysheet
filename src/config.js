@@ -76,4 +76,5 @@ export default {
     //     whiteSpace: "normal" // 添加自动换行属性
     //   },
     defaultBorder:{},
+    show_select_count:true,
 }

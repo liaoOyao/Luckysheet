@@ -4819,7 +4819,7 @@ const menuButton = {
     getTextHeightCache: {},
     getTextSize: function(text, font) {
         let fontarray = locale().fontarray;
-        let f = font || "10pt " + fontarray[0];
+        let f = font || "12pt " + fontarray[4];
 
         let _this = this;
 
@@ -5201,10 +5201,10 @@ const menuButton = {
             }, 500);
         }
     },
-    getStyleByCell: function(d, r, c) {
+    getStyleByCell: function(d, r, c) {  // hz-flag 复制时获取单元格的属性、粘贴时获取数据的
         let _this = this;
         let style = "";
-
+// debugger;
         //交替颜色
         let af_compute = alternateformat.getComputeMap();
         let checksAF = alternateformat.checksAF(r, c, af_compute);
@@ -5235,6 +5235,7 @@ const menuButton = {
             if (getObjType(value) == "object") {
                 continue;
             }
+            // debugger;
 
             if (key == "bg" || checksAF != null || (checksCF != null && checksCF["cellColor"] != null)) {
                 if (checksCF != null && checksCF["cellColor"] != null) {
@@ -5246,40 +5247,39 @@ const menuButton = {
                 }
             }
 
-            // if(!isInline){
-            //     if(key == "bl" && value != "0"){
-            //         style += "font-weight: bold;";
-            //     }
+            
+            if (key == "bl" && value != "0") {
+                style += "font-weight: bold;";
+            }
 
-            //     if(key == "it" && value != "0"){
-            //         style += "font-style:italic;";
-            //     }
+            if (key == "it" && value != "0") {
+                style += "font-style:italic;";
+            }
 
-            //     if(key == "ff" && value != "0"){
-            //         let f = value;
-            //         if(!isNaN(parseInt(value))){
-            //             f = locale_fontarray[parseInt(value)];
-            //         }
-            //         style += "font-family: " + f + ";";
-            //     }
+            if (key == "ff" && value != "0") {
+                let f = value;
+                if (!isNaN(parseInt(value))) {
+                    f = locale_fontarray[parseInt(value)];
+                }
+                style += "font-family: " + f + ";";
+            }
 
-            //     if(key == "fs" && value != "10"){
-            //         style += "font-size: "+ value + "pt;";
-            //     }
+            if (key == "fs" && value != "12") {
+                style += "font-size: " + value + "pt;";
+            }
 
-            //     if((key == "fc" && value != "#000000") || checksAF != null || (checksCF != null && checksCF["textColor"] != null)){
-            //         if(checksCF != null && checksCF["textColor"] != null){
-            //             style += "color: " + checksCF["textColor"] + ";";
-            //         }
-            //         else if(checksAF != null){
-            //             style += "color: " + checksAF[0] + ";";
-            //         }
-            //         else{
-            //             style += "color: " + value + ";";
-            //         }
-            //     }
-            // }
-
+            if ((key == "fc" && value != "#000000") || checksAF != null || (checksCF != null && checksCF["textColor"] != null)) {
+                if (checksCF != null && checksCF["textColor"] != null) {
+                    style += "color: " + checksCF["textColor"] + ";";
+                }
+                else if (checksAF != null) {
+                    style += "color: " + checksAF[0] + ";";
+                }
+                else {
+                    style += "color: " + value + ";";
+                }
+            }
+// debugger;
             if (key == "ht" && value != "1") {
                 if (value == "0") {
                     style += "text-align: center;";
@@ -5324,7 +5324,18 @@ const menuButton = {
         "华文新魏",
         "华文行楷",
         "华文隶书",
+        // 加下来扩展一下字体类型，支持wps 的常用字体格式
+        "Helvetica Neue",
+        "Helvetica",
+        "Arial",
+        "PingFang SC",
+        "Hiragino Sans GB",
+        "Heiti SC",
+        "Microsoft YaHei",
+        "WenQuanYi Micro Hei",
+        "sans-serif",
     ],
+ 
     addFontTolist: function(fontName) {
         fontName = fontName.replace(/"/g, "").replace(/'/g, "");
         let isNone = true;

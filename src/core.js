@@ -138,6 +138,7 @@ luckysheet.create = function(setting) {
     luckysheetConfigsetting.initShowsheetbarConfig = false;
 
     luckysheetConfigsetting.imageUpdateMethodConfig = extendsetting.imageUpdateMethodConfig;
+    luckysheetConfigsetting.show_select_count = extendsetting.show_select_count;
 
     if (Store.lang === "zh") flatpickr.localize(Mandarin.zh);
 

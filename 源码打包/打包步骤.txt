@@ -1,0 +1,2 @@
+1、用handle_utils.py 处理代码
+2、然后替换源码中的对应位置，可搜索  chartmix.umd.min.js
