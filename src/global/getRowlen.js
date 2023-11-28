@@ -1250,7 +1250,8 @@ function getCellTextInfo(cell , ctx, option){
             // let cumColumnWidth = 0;
             let cumWordHeight = 0,cumColumnWidth = 0;
             let rtPI = rt*Math.PI/180;
-            let lastLine = split_all_size[splitLen-1];
+            let lastLine = splitLen > 0 ? split_all_size[splitLen - 1] : { lineHeight: 0, desc: 0 }; // 添加条件检查，避免lastLine为undefined，hz_flag 
+            // let lastLine = split_all_size[splitLen-1];
             let lastLineSpaceHeight = lastLine.lineHeight;
             textH_all = textH_all - lastLineSpaceHeight + lastLine.desc;
             let rw = (textH_all)/Math.sin(rtPI) + textW_all_inner*Math.cos(rtPI);

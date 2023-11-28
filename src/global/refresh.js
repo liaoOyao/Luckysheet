@@ -56,6 +56,7 @@ function jfrefreshgrid(data, range, allParam, isRunExecFunction = true, isRefres
     let cfg = allParam["cfg"];  //config
     let calc = allParam["calc"];
     let RowlChange = allParam["RowlChange"];  //行高改变
+    let CollChange = allParam["CollChange"];  //列宽改变
     let cdformat = allParam["cdformat"];  //条件格式
     let dataVerification = allParam["dataVerification"];  //数据验证
     let dynamicArray = allParam["dynamicArray"];  //动态数组
@@ -112,6 +113,7 @@ function jfrefreshgrid(data, range, allParam, isRunExecFunction = true, isRefres
             "cdformat":  $.extend(true, [], file["luckysheet_conditionformat_save"]),
             "curCdformat": curCdformat,
             "RowlChange": RowlChange,
+            "CollChange": CollChange,
             "dataVerification": $.extend(true, [], file["dataVerification"]),
             "curDataVerification": curDataVerification,
             "dynamicArray": $.extend(true, [], file["dynamicArray"]),
@@ -132,8 +134,8 @@ function jfrefreshgrid(data, range, allParam, isRunExecFunction = true, isRefres
         file.config = Store.config;
 
         server.saveParam("all", Store.currentSheetIndex, cfg, { "k": "config" });
-
-        if(RowlChange != null){
+        // hz_flag
+        if(RowlChange || CollChange){
             jfrefreshgrid_rhcw(Store.flowdata.length, Store.flowdata[0].length);
         }
     }

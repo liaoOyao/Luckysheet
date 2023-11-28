@@ -5944,7 +5944,6 @@ export default function luckysheetHandler() {
         // 
         // hz 添加的特殊操作：
         // 1.（lh - 20230922）z粘贴时保留换行符
-
         if (isEditMode()) {
             //此模式下禁用粘贴
             return;
@@ -6021,7 +6020,6 @@ export default function luckysheetHandler() {
                     if (r - copy_r1 > cpDataArr.length - 1) {
                         break;
                     }
-
                     for (let c = copy_c1; c <= copy_c2; c++) {
                         let cell = d[r][c];
                         let isInlineStr = false;
@@ -6083,7 +6081,7 @@ export default function luckysheetHandler() {
                     Store.luckysheet_paste_iscut = false;
                     selection.pasteHandlerOfCutPaste(Store.luckysheet_copy_save);
                     selection.clearcopy(e);
-                } else {
+                } else { // 内部粘贴直接走了这个方法
                     selection.pasteHandlerOfCopyPaste(Store.luckysheet_copy_save);
                 }
             } else if (txtdata.indexOf("luckysheet_copy_action_image") > -1) {
@@ -6141,337 +6139,381 @@ export default function luckysheetHandler() {
                     $("#luckysheet-copy-content") // hz_tag 从luckysheet-copy-content 中寻找复制到的元素
                         .find("table tr")
                         .each(function() {
+                            // debugger;
                             let $tr = $(this);
                             let c = 0;
                             let txt_td_p_v = null;
                             let td_p_num = 0 ;
-                            $tr.find(cellElements).each(function() { // 处理tr 中每个元素的td
-                                debugger;
+                            let now_r =  Store.luckysheet_select_save[0]["row"][0] + r;  // 当前更改那一行 
+                            let is_luckysheet_table_data_flag = false; // 用来标识luckysheet 内部粘贴的的数据标识
+                            let colgroupElement = null;
+                            if(this.parentElement.parentElement.getAttribute('data-type') === 'luckysheet_copy_action_table') {
+                                is_luckysheet_table_data_flag = true; // 标明这个是luckysheet 内部粘贴的数据，       
+                                colgroupElement = this.parentNode.parentNode.firstChild;
+                            }
+                            
+                            // debugger;
+
+                            // 先尝试从属性中获取
+                            let row_h = null;
+                            row_h = this.getAttribute('height');
+                            if (!row_h) {
+                                row_h = this.style.height;
+                                if (row_h && row_h !== '') {
+                                    rowlen[now_r] = handle_pt_or_px(row_h);
+                                }
+                            }else {
+                                if(row_h === '0') { //尝试从table 哪里获取
+                                    row_h = this.parentElement.parentElement.style.height;
+                                    if(!row_h){
+                                        row_h =  null;
+                                    }
+                                }
+                                if(row_h){
+                                    let parsedHeight = Math.round(parseInt(row_h) / 3.6);
+                                    if (parsedHeight > 100) {
+                                      rowlen[now_r] = parsedHeight;
+                                    }else {
+                                        rowlen[now_r] = handle_pt_or_px(row_h);
+                                    }
+                                    
+                                }
+                            }
+                           
+                            let col_w = "";
+                            // debugger;
+                            $tr.find(cellElements).each(function () { // 处理tr 中每个元素的td
+                                // debugger;
+                                let now_c = Store.luckysheet_select_save[0]["column"][0] + c; // 当前更改那一列 
+                                if (is_luckysheet_table_data_flag) {  // 处理表格内部复制的列宽信息
+                                    let colElement = colgroupElement.children[c];
+                                    if (colElement) {
+                                        col_w = colElement.getAttribute('width');
+                                        
+                                            if (col_w === '0') { //尝试从table 哪里获取
+                                                col_w = this.parentElement.parentElement.style.width;
+                                                if (!col_w) { // 如果还是获取不到
+                                                    col_w = null;
+                                                }
+                                            }
+                                            
+                                        if(col_w ){
+                                            columnlen[now_c] = handle_pt_or_px(col_w);
+                                        }
+                                    }
+
+                                } else {
+                                    // debugger;
+                                    col_w = this.getAttribute('width');
+                                    if (!col_w) {
+                                        col_w = this.style.width;
+                                        if (col_w && col_w !== '') {
+                                            columnlen[now_c] = handle_pt_or_px(col_w);
+                                        }
+                                    } else {
+                                        if (col_w === '0') { //尝试从table 哪里获取
+                                            col_w = this.parentElement.parentElement.style.width;
+                                            if (!col_w) {
+                                                col_w = null;
+                                            }
+                                        }
+                                        if (col_w) {
+                                            columnlen[now_c] = handle_pt_or_px(col_w);
+                                        }
+                                    }
+                                }
+                     
+
                                 let $td = $(this);
-                                // 如果当前是p 标签并且上一个是p 标签
+                            // 如果当前是p 标签并且上一个是p 标签
                                 // 那么 给当前cell 添加一个换行的标识
                               
                                 let cell = {};
                                 let txt = $td.text();
-                                let fontSize = null;
-                                let fontFamily = null;
-                                let fontWeight = null;
                                 let origin_v = null;
                                 let special_td_flag = false; // 特殊td标识，标识是否是wps 这种特殊的格式
                                 let td_many_s = []; // ct->->s的数组 cell.v.ct 中s 的值
-                                let childrenCount = 0 // 获取子元素数量，这里没有获取到td 下的标签元素的数量，现在都是为0，请修复
+                                let td_only_br_and_content = false ; // 当前单元格只包括 br 这种情况，如果有了这个标识，$td.find("*")就不用再执行
+                                let td_br_many_s = []; // ct->->s的数组 cell.v.ct 中s 的值, 当前单元格只包括 br 这种情况
+                                let td_contain_tag =  false;  // 用来标识和处理  <p><span style='font-family:微软雅黑;font-size:18pt;font-weight:bold;color:#ffffff'>序号</span > < /p> 这种情况
+                                let last_p_and_now_p = false; // 用来标记两次出现了p
+                                
                                 if ($.trim(txt).length == 0) {
                                     cell.v = null;
                                     cell.m = "";
                                 } 
                                 else 
                                 {
-                                    // debugger;
+                                      // hz_flag 这个是为了处理   $(this).innerHTML = "12312312<br>2131231<br><br><br>" 这种类型的数据,这种数据每行都没有样式
+                                    var content = $(this).html();
+                                    // let text = $(this).text();
+                                    if (/<br\s*\/?>/.test(content.trim()) && !/<\/?[^br\/][^>]*>/.test(content.trim())) {
+                                        // 匹配成功，内容只包含文字和<br>标签
+                                        // 1、 将里面的内容一个一个切割出来
+                                        // 2、 设置 td_only_br_and_content，设置一个单独的[]存储切割出来的内容
+                                        //3、 最后将对应的数据替换到ct 中
+
+                                        // 处理1 
+                                        var parts = content.split(/<br\s*\/?>/);
+                                        let cell_br_s_parent = JSON.parse(JSON.stringify(get_paste_cell_style($td, cell, styleMap)));
+                                        // debugger;
+
+                                        for (var i = 0; i < parts.length; i++) {
+                                            // debugger;
+                                            // 深拷贝一个上面的
+                                            let cell_br_s =  JSON.parse(JSON.stringify(cell_br_s_parent));
+                                            console.log(parts[i]); // 这里可以处理每一个切割后的部分
+                                            parts[i] = parts[i].trim(); // // 去除每个元素内的多余空格
+                                            if (parts[i] === '\n') { // 只有\n 和个空格
+                                                parts[i] = '\r\n';
+                                            } else {
+                                                parts[i] = parts[i] ;
+                                            }
+                                            if (parts[i] && parts[i].length == 0) {
+                                                cell_br_s.v = null;
+                                                cell_br_s.m = "";
+                                            } else {
+                                                cell_br_s.v = parts[i];
+                                                cell_br_s.m = parts[i];
+                                            }
+                                            td_br_many_s.push(cell_br_s);
+
+                                         
+                                         
+                                        }
+
+                                          //  上面的处理无法渲染
+                                        //     debugger;
+                                        // cell.v = text;
+                                        // cell.m = text;
+                                        // cell = get_paste_cell_style($td, cell);
+                                        // td_br_many_s.push(cell);
+                                         td_only_br_and_content =  true;
+                                      } else {
+                                 
+
+                                        // td_contain_tag =  false; 用来标识和处理  <p><span style='font-family:微软雅黑;font-size:18pt;font-weight:bold;color:#ffffff'>序号</span > < /p> 这种情况
+                                        console.log(($(this).children().length));
+                                        if (this.nodeType == 1 && ($(this).children().length === 1) ){ // 其中$(this).children().length是判断它的孩子而不是孩子的下一代
+                                            // 跳过包含标签的文本节点
+                                            td_contain_tag = true;
+                                            cell = get_paste_cell_style_two_tag($td, cell,styleMap);
+                                        }
+
+                                         // debugger;
                                     // hz_tag 保留换行符
                                     // 如果$td.html()中有包含2个以上的标签，设置一个flag
-                                    if ($td.find('*').length > 2 && $td.find('font').length == 0 && $td.find('p').length < 1) {
-                                        debugger;
-                                        // 设置flag
-                                        special_td_flag = true;
-                                        origin_v = $td.contents().first().text(); // 获取第一个子元素的文
-                                    }
-                                        let _html = $td.html().replace(/<br>/g, '\n') +'';
-                                        // let _html = $td.html().replace(/<br>/g, '\r\n') +'';
-                                        // let _html = $td.html().replace(/<br\s*\/?>/g, '\r\n') + '';
-                                        let _div_temp = $(`<div>${_html}</div>`)
-                                        let _text = _div_temp.text()
-                                        // let mask = genarate($td.text());
-                                        let mask = genarate(_text);
-    
-                                        cell.v = mask[2];
-                                        cell.ct = mask[1];
-                                        cell.m = mask[0];
+                                          if ($td.find('*').length > 2 && $td.find('font').length == 0 && $td.find('p').length < 1) {
+                                            //   debugger;
+                                              // 设置flag
+                                              special_td_flag = true;
+                                              origin_v = $td.contents().first().text(); // 获取第一个子元素的文
+                                          } else if ($td.contents().filter(function () {
+                                              return this.nodeType === Node.TEXT_NODE && this.textContent.trim() !== '';
+                                          }).length > 0) {
+                                            //   debugger;
+                                              // 设置flag
+                                              special_td_flag = true;
+                                              origin_v = $td.contents().filter(function () {
+                                                  return this.nodeType === Node.TEXT_NODE && this.textContent.trim() !== '';
+                                              }).first().text(); // 获取第一个非空文本节点的内容
+                                          }
+                                          // 不只包含<br>标签的处理逻辑
+                                          // let _html = $td.html().replace(/<br>/g, '\n') +'';
+                                          let _html = $td.html().replace(/<br>/g, '\r\n') + '';
+                                          // let _html = $td.html().replace(/<br\s*\/?>/g, '\r\n') + '';
+                                          let _div_temp = $(`<div>${_html}</div>`)
+                                          let _text = _div_temp.text()
+                                          // let mask = genarate($td.text());
+                                          let mask = genarate(_text);
+
+                                          cell.v = mask[2];
+                                          cell.ct = mask[1];
+                                          cell.m = mask[0];
+                                      }
+                                
                                     
                                     if(special_td_flag){
                                         cell.v =origin_v
                                         cell.m =origin_v;
-                                    }    
+                                    }   
+                                    
+                                  
                                    
                                 }
 
                              
                                 //hz_flag
-                                $td.find("*").each(function () { // 处理 td 中每个元素，如果有
-                                    debugger;
-                                    const $td_c = $(this);
-                                    // var $content = $child.contents();
-                                    // 判断元素是否为标签或者元素的内容是否为标签
-                                    // if ($child[0].nodeType !== 1 || ($content.length === 1 && $content[0].nodeType === 1)) {
-                                    //     return; // 跳过本次操作
-                                    // }
-                                    console.log(($(this).children().length));
-                                    console.log(($(this).children().length) > 1 );
-                                    console.log(this.nodeType == 1);
-                                    if (this.nodeType == 1 && ($(this).children().length >= 1)  || ($td_c.is("br")) ){
-                                        return; // 跳过包含标签的文本节点 、br 标签
-                                    }
-                                    debugger;
-                                    
-                                    let txt_td_c = $td_c.text(); // 当前文本
-                               
-                                    childrenCount++;
-                                    
-
-                                    // td.1 获取字体的一些属性
-                                    // td.2 设置字体的一些属性
-                                    let td_c_cell = {}; // td的单元格
-                                    let fontSize_td_c = null;
-                                    let fontFamily_td_c = null;
-                                    let fontWeight_td_c = null;
-                                    // let backgroundColor_td_c = null;
-                                    let fontColor_td_c = null;
-                                    let un_td_c = null;
-                                    let it_td_c = null;
-
-                                    if ($td_c.is("br")) {
-                                        txt_td_c = "\r\n"; // 如果当前获取到的元素是br 标签，txt_td_c需要设置成换行换行符
-                                    }
-                                    // 处理td
-                                    if (txt_td_c.length == 0) {
-                                        td_c_cell.v = null;
-                                        td_c_cell.m = "";
-                                    } else {
-                                        td_c_cell.v = txt_td_c;
-                                        td_c_cell.m = txt_td_c;
-                                    }
-                                    if (td_c_cell.v) {
-                                        if ($td_c.attr('class')) {
-                                            let className = $td_c.attr('class');
-                                            if (styleMap[className]) {
-                                                fontColor_td_c = styleMap[className]['color'];
-                                                fontWeight_td_c = styleMap[className]['font-weight'];
-                                                fontSize_td_c = styleMap[className]['font-size'];
-                                                fontFamily_td_c = styleMap[className]['font-family'];
-                                            }
-                                        } else {
-                                            fontColor_td_c = $td_c.css("color");
-                                            if (fontColor_td_c) { // 说明该标签上有内容，所以有样式
-                                                if (fontColor_td_c == "rgba(0, 0, 0, 0)") {
-                                                    fontColor_td_c = null;
-                                                }
-                                            }
-
-                                            fontWeight_td_c = $td_c.css("font-weight");
-
-                                            // 检测下划线
-                                            un_td_c = $td_c.css("text-decoration");
-
-                                            it_td_c = $td_c.css("font-style");
-
-                                            fontSize_td_c = $td_c.css('font-size');
-
-                                            if (!fontSize_td_c && fontSize_td != 0) {
-                                                fontSize_td_c = 12;
-                                            } else {
-                                                if (fontSize_td_c.endsWith("px")) {
-                                                    let pxValue = parseInt(fontSize_td_c, 10);
-                                                    fontSize_td_c = Math.round(pxValue / 1.333);
-                                                } else {
-                                                    fontSize_td_c = parseInt(fontSize_td, 10);
-                                                }
-                                            }
-
-                                            fontFamily_td_c = $td.css("font-family");
-                                        }
-
-
-                                        td_c_cell.fc = fontColor_td_c;
-                                        if (fontWeight_td_c == "400" || fontWeight_td_c == "normal" || fontWeight_td_c == '400') {
-                                            td_c_cell.bl = 0;
-                                        } else {
-                                            td_c_cell.bl = 1;
-                                        }
-                                        if (un_td_c && un_td_c.indexOf("underline") != -1) {
-                                            td_c_cell.un = 1;
-                                        }
-                                        if (it_td_c == "normal") {
-                                            td_c_cell.it = 0;
-                                        } else {
-                                            td_c_cell.it = 1;
-                                        }
-                                        td_c_cell.fs = fontSize_td_c;
-                                        if (fontFamily_td_c) { // 说明该标签上有内容，所以有样式
-                                            let fontFamily_td_c_temp = fontFamily_td_c.toLowerCase();
-                                            fa_td_c = locale_fontjson[fontFamily_td_c_temp];
-                                            if (!fa_td_c && fa_td_c !== 0) {
-                                                fa_td_c = 4;
-                                            }
-                                        }
-
-                                        td_c_cell.ff = fontFamily_td_c;
-                                        debugger;
-                                        td_many_s.push(td_c_cell);
-                                    }
-                
-                                });
-
-                                //hz_flag 
-                                //  debugger;  
-                                try {
-                                    let classNames_dom = $td.attr("class");
-                                    let classNames = null;
-                                    if (classNames_dom) {
-                                        classNames = classNames_dom.split(/\s+/); //获取到该单元格类名
-                                    }
-                                    try {
-                                        if (classNames && styleMap.hasOwnProperty(classNames[0]) && styleMap[classNames[0]].hasOwnProperty('font-size')) {
-                                            fontSize = styleMap[classNames[0]]['font-size'];
-                                            fontSize = fontSize ? parseInt(fontSize, 10) : null;
-                                        } else {
-                                            fontSize = $td.css("font-size");
-                                            if (!fontSize) {
-                                                fontSize = $td.find('span').css('font-size');
-                                            }
-                                        }
-                                        if (classNames && styleMap.hasOwnProperty(classNames[0]) && styleMap[classNames[0]].hasOwnProperty('font-weight')) {
-                                            fontWeight = styleMap[classNames[0]]['font-weight'];
-                                        } else {
-                                            fontWeight = $td.css("fontWeight");
-                                            if (!fontWeight) {
-                                                fontWeight = $td.find('span').css('fontWeight');
-                                            }
-                                        }
-                                        if (classNames && styleMap.hasOwnProperty(classNames[0]) && styleMap[classNames[0]].hasOwnProperty('font-family')) {
-                                            fontFamily = styleMap[classNames[0]]['font-family'];
-                                        } else {
-                                            fontFamily = $td.css("font-family");
-                                            if (!fontFamily) {
-                                                fontFamily = $td.find('span').css('font-family');
-                                            }
-                                        }
-                                    } catch (error) {
-                                        fontSize = $td.find('p').css('font-size');
-                                        fontWeight = $td.find('p').css('fontWeight');
-                                        fontFamily = $td.find('p').css('font-family');
-                                    }
-
-                                    if (fontSize) {
-                                        if (fontSize.endsWith("px")) {
-                                            let pxValue = parseInt(fontSize, 10);
-                                            fontSize = Math.round(pxValue / 1.333);
-                                        } else {
-                                            fontSize = parseInt(fontSize, 10);
-                                        }
-                                    }
-                                } catch (error) {
-                                    // console.log(1);
-                                }
-                                   
-                                
-                                
+                                if (!td_only_br_and_content && !td_contain_tag){
+                                    let last_p = false ; // hz_flag 用来标识td 中 上一个兄弟节点是不是为p 标签，td 是每一个一级的元素来循环
+                                    $td.find("*").each(function () { // 处理 td 中每个元素，如果有
+                                        // debugger;
+                                        const $td_c = $(this);
+                                        // var $content = $child.contents();
+                                        // 判断元素是否为标签或者元素的内容是否为标签
+                                        // if ($child[0].nodeType !== 1 || ($content.length === 1 && $content[0].nodeType === 1)) {
+                                        //     return; // 跳过本次操作
+                                        // }
                                   
-                                let bg = $td.css("background-color");
-                                if (bg == "rgba(0, 0, 0, 0)") {
-                                    bg = null;
-                                }
-                                // if(backgroundColor){
-                                //     bg = backgroundColor;
-                                // }
-                                cell.bg = bg;
+                                        console.log(($(this).children().length));
+                                        console.log(($(this).children().length) > 1 );
+                                        console.log(this.nodeType == 1);
+                                        // if (this.nodeType == 1 && ($(this).children().length >= 1)  || ($td_c.is("br")) && !($td_c.is("font")) ){
+                                        if (this.nodeType == 1 && ($(this).children().length >= 1) && !($td_c.is("font")) ){
 
-                                let bl = $td.css("font-weight");
-                                if (bl == 400 || bl == "normal" || bl == '400' ) {
-                                    cell.bl = 0;
-                                } else {
-                                    cell.bl = 1;
-                                }
-                                
-                                // 检测下划线
-                                let un = $td.css("text-decoration");
-                                if (un.indexOf("underline") != -1) {
-                                    cell.un = 1;
-                                }
+                                            // 如果是p 标签标记一下
+                                            if ($td_c.is("p")) { // 将p 标签标记出来
+                                                if(last_p) {
+                                                    last_p_and_now_p = true;
+                                                }else {
+                                                    last_p = true;
+                                                }
+                                            }
+                                            return; // 跳过包含标签的文本节点 、br 标签
+                                        }
+                                        // debugger;
+                                        
+                                        // 处理上一个p 遗留的换行的问题，主要是ppt的 // hz_flag
+                                        if(last_p_and_now_p){
+                                            // 将最后一个元素取出来，将值设置为换行然后推送进去
+                                            if(td_many_s.length > 0){
+                                                let lastElement_cell = JSON.parse(JSON.stringify(td_many_s[td_many_s.length - 1])); // 可深刻json 类型可序列化的，函数和循环引用不可拷贝
+                                                txt_td_p_v = "\r\n"; // 需要在前面
+                                                lastElement_cell.v = txt_td_p_v;
+                                                lastElement_cell.m = txt_td_p_v;
+                                                td_many_s.push(lastElement_cell);
+                                                last_p_and_now_p = false;
+                                            }
+                                        }
+                                        let txt_td_c = $td_c.text(); // 当前文本
+                                   
+                                        
+    
+                                        // td.1 获取字体的一些属性
+                                        // td.2 设置字体的一些属性
+                                        let td_c_cell = {}; // td的单元格
+                                        let fontSize_td_c = null;
+                                        let fontFamily_td_c = null;
+                                        let fontWeight_td_c = null;
+                                        // let backgroundColor_td_c = null;
+                                        let fontColor_td_c = null;
+                                        let un_td_c = null;
+                                        let it_td_c = null;
+    
+                                        if ($td_c.is("br")) {
+                                            txt_td_c = "\r\n"; // 如果当前获取到的元素是br 标签，txt_td_c需要设置成换行换行符
+                                        }
+                                        // 处理td
+                                        
+                                        if (txt_td_c.length == 0) {
+                                            // debugger;
+                                            if($td_c.is("font") && txt_td_c ===''){ // 兼容luckysheet 内部复制时，数据错误的bug
+                                                txt_td_c = "\r\n";
+                                            }
+                                            td_c_cell.v = txt_td_c;
+                                            td_c_cell.m = txt_td_c;
+                                        } else {
+                                            // debugger;
+                                            td_c_cell.v = txt_td_c;
+                                            td_c_cell.m = txt_td_c;
+                                        }
+                                        if (td_c_cell.v) {
+                                            if ($td_c.attr('class')) {
+                                                let className = $td_c.attr('class');
+                                                if (styleMap[className]) {
+                                                    fontColor_td_c = styleMap[className]['color'];
+                                                    fontWeight_td_c = styleMap[className]['font-weight'];
+                                                    fontSize_td_c = styleMap[className]['font-size'];
+                                                    fontFamily_td_c = styleMap[className]['font-family'];
+                                                }
+                                            } else {
+                                                fontColor_td_c = $td_c.css("color");
+                                                if (fontColor_td_c) { // 说明该标签上有内容，所以有样式
+                                                    if (fontColor_td_c == "rgba(0, 0, 0, 0)") {
+                                                        fontColor_td_c = null;
+                                                    }
+                                                }
+    
+                                                fontWeight_td_c = $td_c.css("font-weight");
+    
+                                                // 检测下划线
+                                                un_td_c = $td_c.css("text-decoration");
+    
+                                                it_td_c = $td_c.css("font-style");
+    
+                                                fontSize_td_c = $td_c.css('font-size');
+    
+                                                if (!fontSize_td_c && fontSize_td != 0) {
+                                                    fontSize_td_c = 12;
+                                                } else {
+                                                    if (fontSize_td_c.endsWith("px")) {
+                                                        let pxValue = parseInt(fontSize_td_c, 10);
+                                                        fontSize_td_c = Math.round(pxValue / 1.333);
+                                                    } else {
+                                                        fontSize_td_c = parseInt(fontSize_td_c, 10);
+                                                    }
+                                                }
+    
+                                                fontFamily_td_c = $td.css("font-family");
+                                            }
+    
+    
+                                            td_c_cell.fc = fontColor_td_c;
+                                            if (fontWeight_td_c == "400" || fontWeight_td_c == "normal" || fontWeight_td_c == '400') {
+                                                td_c_cell.bl = 0;
+                                            } else {
+                                                td_c_cell.bl = 1;
+                                            }
+                                            if (un_td_c && un_td_c.indexOf("underline") != -1) {
+                                                td_c_cell.un = 1;
+                                            }
+                                            if (it_td_c == "normal") {
+                                                td_c_cell.it = 0;
+                                            } else {
+                                                td_c_cell.it = 1;
+                                            }
+                                            td_c_cell.fs = fontSize_td_c;
+                                            if (fontFamily_td_c) { // 说明该标签上有内容，所以有样式
+                                                let fontFamily_td_c_temp = fontFamily_td_c.toLowerCase();
+                                                fa_td_c = locale_fontjson[fontFamily_td_c_temp];
+                                                if (!fa_td_c && fa_td_c !== 0) {
+                                                    fa_td_c = 4;
+                                                }
+                                            }
 
-                                let it = $td.css("font-style");
-                                if (it == "normal") {
-                                    cell.it = 0;
-                                } else {
-                                    cell.it = 1;
-                                }
+                                            // 垂直对齐属性
+                                            let vt = $td.css("vertical-align");
+                                            if (vt == "middle") {
+                                                cell.vt = 0;
+                                            } else if (vt == "top" || vt == "text-top") {
+                                                cell.vt = 1;
+                                            } else {
+                                                cell.vt = 2;
+                                            }
+                                            // 水平对齐属性
+                                          
+                                            let ht = $td.css("text-align");
+                                            // if(vt == "middle" && !ht  || (!ht && (vt == "top" || vt == "text-top")) ){ // 如果水平方向的获取不到，但是垂直方向是居中，兼容wps 的水平方向上也居中
+                                            //     ht == "center";
+                                            // }
+                                            if (ht == "center") {
+                                                cell.ht = 0;
+                                            } else if (ht == "right") {
+                                                cell.ht = 2;
+                                            } else {
+                                                cell.ht = 1;
+                                            }
 
-                                let ff = $td.css("font-family");
-                                // let ffs = ff.split(",");
-                                //debugger;
-                                // for (let i = 0; i < ffs.length; i++) {
-                                //     let fa = ffs[i].replace(/"/g, "").trim().toLowerCase();
-                                //     if(fontFamily){
-                                //         fa = fontFamily;
-                                //     }
-                                //     // let fa = $.trim(ffs[i].toLowerCase());
-                                //     fa = locale_fontjson[fa];
-                                //     if (fa == null) {
-                                //         cell.ff = 4; // hz_flag  默认改成微软雅黑
-                                //     } else {
-                                //         cell.ff = fa;
-                                //         break;
-                                //     }
-                                // }
-                                // debugger;
-                                // console.log("Microsoft YaHei")
-                                // console.log(fontFamily)
-                                // console.log(locale_fontjson);
-                                // console.log(locale_fontjson[fontFamily]);
-                                
-                              if(fontFamily){ // hz-flag 相似类型的都是hz-flag
-                                let lowerCaseFontFamily = fontFamily.toLowerCase();
-                                fa = locale_fontjson[lowerCaseFontFamily];
-                                cell.ff = fa;
-                              }
-                                // let fs = Math.round((parseInt($td.css("font-size")) * 72) / 96);
-                                // console.log($td.css("font-size"))
-                                // console.log($td.css())
-                                // let style = window.getComputedStyle($td[0]);
-                                // let fontSizePattern = /font-size:\s*([\d.]+)pt/;
-                                // let match = fontSizePattern.exec($td.attr("style"));
-                                // //debugger;
-                                // if (match && match[1]) {
-                                //     let fs = parseFloat(match[1]);
-                                //     console.log("Inline 字体大小(磅(pt)): ", fs);
-                                // } else {
-                                //     console.log("未找到对应的font-size属性");
-                                // }
-                                // let wpsFontSize = Math.round((fs * 16) / 12);
-                                // let excelFontSize = Math.round((fs * 12) / 9);
-                                // if (wpsFontSize >= 12) {
-                                //   fs = wpsFontSize;
-                                // } else {
-                                //   fs = excelFontSize;
-                                // }
-                                // debugger;
-                                let fs = Math.round((parseInt($td.css("font-size")) * 72) / 96);
-                                if(fontSize){
-                                    fs = fontSize;
+                                            td_c_cell.ff = fontFamily_td_c;
+                                            
+                                        }
+                                        td_many_s.push(td_c_cell);
+                                    });
+                                    cell = get_paste_cell_style($td, cell,styleMap);
+                                    
                                 }
-                       
-                                cell.fs = fs;
+                               
 
-                                let fc = $td.css("color");
-                                cell.fc = fc;
-
-                                // 水平对齐属性
-                                let ht = $td.css("text-align");
-                                if (ht == "center") {
-                                    cell.ht = 0;
-                                } else if (ht == "right") {
-                                    cell.ht = 2;
-                                } else {
-                                    cell.ht = 1;
-                                }
-
-                                // 垂直对齐属性
-                                let vt = $td.css("vertical-align");
-                                if (vt == "middle") {
-                                    cell.vt = 0;
-                                } else if (vt == "top" || vt == "text-top") {
-                                    cell.vt = 1;
-                                } else {
-                                    cell.vt = 2;
-                                }
                                 // hz-flag  处理行高和列宽的问题
                                 while (c < colLen && data[r][c] != null) {
                                     c++;
@@ -6481,9 +6523,9 @@ export default function luckysheetHandler() {
                                     return true;
                                 }
                              
-                                debugger;
+                                // debugger;
                                 if (special_td_flag && td_many_s.length > 1) {
-                                    debugger;
+                                    // debugger;
                                     let orgin_cell_copy = null;
                                     // 深拷贝cell对象
                                     orgin_cell_copy = $.extend(true, {}, cell);
@@ -6503,35 +6545,37 @@ export default function luckysheetHandler() {
                                 // }
                                 // 如果有
                                 // 参照$td.find("*")中的写法，如果special_td_flag为true 时，向td_many_s的最前面添加一个对象,对象里面的属性是参照td_c_cell
-                                debugger;
-                                if (td_many_s.length > 1 || td_p_num > 1) { // 说明获取到了td 下的多个数据,或者 获取到了多个p 标签td_p_num > 1
+                                // debugger;
+                                if (td_many_s.length > 1 || td_p_num > 1 || td_only_br_and_content) { // 说明获取到了td 下的多个数据,或者 获取到了多个p 标签td_p_num > 1
                                     // 删除cell  cell.v 下的v 属性，如果每一个为空就创建为对象，然后删除cell.v.v 属性
                                     if (!cell.hasOwnProperty('ct')) { // 没有v 属性
                                         cell.ct = {}
-                                    } else {
-                                        if (cell.hasOwnProperty('v')) {
-                                            // origin_v = cell.v
-                                            delete cell.v;
-                                        }
-                                        // 接下来类似删除m 属性，如果每一个为空就创建为对象，然后删除cell.m.m 属性
-                                        if (cell.hasOwnProperty('m')) {
-                                            // origin_m = cell.ct.m
-                                            delete cell.m;
-                                        }
-
+                                    } 
+                                    if (cell.hasOwnProperty('v')) {
+                                        // origin_v = cell.v
+                                        delete cell.v;
                                     }
-                                    debugger;
+                                    // 接下来类似删除m 属性，如果每一个为空就创建为对象，然后删除cell.m.m 属性
+                                    if (cell.hasOwnProperty('m')) {
+                                        // origin_m = cell.ct.m
+                                        delete cell.m;
+                                    }
+
+                                    // debugger;
                                     // 将数组赋值给cell.v.ct 对象
                                     if (!cell.ct) {
-                                        cell.ct = { "fa": "@", "t": "inlineStr", "s": td_many_s }
+                                        cell.ct = { "fa": "@", "t": "inlineStr", "s": td_only_br_and_content ?td_br_many_s:td_many_s ,"t": 'inlineStr'}
                                     } else {
-                                        if (cell.ct.hasOwnProperty('t') && cell.ct.t !== "inlineStr") {
+                                        if (!cell.ct.hasOwnProperty('t') || cell.ct.t !== "inlineStr") {
                                             cell.ct.t = 'inlineStr';
                                         }
-                                        debugger;
-                                        cell.ct.s = td_many_s;
-                                        debugger;
+                                        if(!cell.ct.hasOwnProperty('fa')){
+                                            cell.ct.fa = "@";
+                                        }
+                                        // debugger;
+                                        cell.ct.s = td_only_br_and_content ?td_br_many_s:td_many_s;
                                     }
+                                    
 
                                 }
                                 
@@ -6539,7 +6583,7 @@ export default function luckysheetHandler() {
 
                                 if (data[r][c] == null) {
                                     data[r][c] = cell;
-                                    debugger;
+                                    // debugger;
                                     let rowspan = parseInt($td.attr("rowspan"));
                                     let colspan = parseInt($td.attr("colspan"));
 
@@ -6770,7 +6814,445 @@ export default function luckysheetHandler() {
         }
     });
 }
+ function get_paste_cell_style($td, cell,styleMap){
+    //hz_flag 
+    //  debugger;  
+    let fontSize = null;
+    let fontFamily = null;
+    let fontWeight = null;
+    const locale_fontjson = locale().fontjson;
+    try {
+        let classNames_dom = $td.attr("class");
+        let classNames = null;
+        if (classNames_dom) {
+            classNames = classNames_dom.split(/\s+/); //获取到该单元格类名
+        }
+        try {
+            if (classNames && styleMap.hasOwnProperty(classNames[0]) && styleMap[classNames[0]].hasOwnProperty('font-size')) {
+                fontSize = styleMap[classNames[0]]['font-size'];
+                fontSize = fontSize ? parseInt(fontSize, 10) : null;
+            } else {
+                fontSize = $td.css("font-size");
+                if (!fontSize) {
+                    fontSize = $td.find('span').css('font-size');
+                }
+            }
+            if (classNames && styleMap.hasOwnProperty(classNames[0]) && styleMap[classNames[0]].hasOwnProperty('font-weight')) {
+                fontWeight = styleMap[classNames[0]]['font-weight'];
+            } else {
+                fontWeight = $td.css("fontWeight");
+                if (!fontWeight) {
+                    fontWeight = $td.find('span').css('fontWeight');
+                }
+            }
+            if (classNames && styleMap.hasOwnProperty(classNames[0]) && styleMap[classNames[0]].hasOwnProperty('font-family')) {
+                fontFamily = styleMap[classNames[0]]['font-family'];
+            } else {
+                fontFamily = $td.css("font-family");
+                if (!fontFamily) {
+                    fontFamily = $td.find('span').css('font-family');
+                }
+            }
+        } catch (error) {
+            fontSize = $td.find('p').css('font-size');
+            fontWeight = $td.find('p').css('fontWeight');
+            fontFamily = $td.find('p').css('font-family');
+        }
 
+        if (fontSize) {
+            if (fontSize.endsWith("px")) {
+                let pxValue = parseInt(fontSize, 10);
+                fontSize = Math.round(pxValue / 1.333);
+            } else {
+                fontSize = parseInt(fontSize, 10);
+            }
+        }
+    } catch (error) {
+        // console.log(1);
+    }
+
+
+
+
+    let bg = $td.css("background-color");
+    if (bg == "rgba(0, 0, 0, 0)") {
+        bg = null;
+    }
+    // if(backgroundColor){
+    //     bg = backgroundColor;
+    // }
+    cell.bg = bg;
+
+    let bl = $td.css("font-weight");
+    if (bl == 400 || bl == "normal" || bl == '400') {
+        cell.bl = 0;
+    } else {
+        cell.bl = 1;
+    }
+
+    // 检测下划线
+    let un = $td.css("text-decoration");
+    if (un.indexOf("underline") != -1) {
+        cell.un = 1;
+    }
+
+    let it = $td.css("font-style");
+    if (it == "normal") {
+        cell.it = 0;
+    } else {
+        cell.it = 1;
+    }
+
+    let ff = $td.css("font-family");
+    // let ffs = ff.split(",");
+    //debugger;
+    // for (let i = 0; i < ffs.length; i++) {
+    //     let fa = ffs[i].replace(/"/g, "").trim().toLowerCase();
+    //     if(fontFamily){
+    //         fa = fontFamily;
+    //     }
+    //     // let fa = $.trim(ffs[i].toLowerCase());
+    //     fa = locale_fontjson[fa];
+    //     if (fa == null) {
+    //         cell.ff = 4; // hz_flag  默认改成微软雅黑
+    //     } else {
+    //         cell.ff = fa;
+    //         break;
+    //     }
+    // }
+    // debugger;
+    // console.log("Microsoft YaHei")
+    // console.log(fontFamily)
+    // console.log(locale_fontjson);
+    // console.log(locale_fontjson[fontFamily]);
+
+    if (fontFamily) { // hz-flag 相似类型的都是hz-flag
+        let lowerCaseFontFamily = fontFamily.toLowerCase();
+        fa = locale_fontjson[lowerCaseFontFamily];
+        cell.ff = fa;
+    }
+    // let fs = Math.round((parseInt($td.css("font-size")) * 72) / 96);
+    // console.log($td.css("font-size"))
+    // console.log($td.css())
+    // let style = window.getComputedStyle($td[0]);
+    // let fontSizePattern = /font-size:\s*([\d.]+)pt/;
+    // let match = fontSizePattern.exec($td.attr("style"));
+    // //debugger;
+    // if (match && match[1]) {
+    //     let fs = parseFloat(match[1]);
+    //     console.log("Inline 字体大小(磅(pt)): ", fs);
+    // } else {
+    //     console.log("未找到对应的font-size属性");
+    // }
+    // let wpsFontSize = Math.round((fs * 16) / 12);
+    // let excelFontSize = Math.round((fs * 12) / 9);
+    // if (wpsFontSize >= 12) {
+    //   fs = wpsFontSize;
+    // } else {
+    //   fs = excelFontSize;
+    // }
+    // debugger;
+    let fs = Math.round((parseInt($td.css("font-size")) * 72) / 96);
+    if (fontSize) {
+        fs = fontSize;
+    }
+
+    cell.fs = fs;
+
+    let fc = $td.css("color");
+    cell.fc = fc;
+
+    // 水平对齐属性
+    let ht = $td.css("text-align");
+    if (ht == "center") {
+        cell.ht = 0;
+    } else if (ht == "right") {
+        cell.ht = 2;
+    } else {
+        cell.ht = 1;
+    }
+
+    // 垂直对齐属性
+    let vt = $td.css("vertical-align");
+    // if(vt == "middle" && !ht  || (!ht && (vt == "top" || vt == "text-top")) ){ // 如果水平方向的获取不到，但是垂直方向是居中，兼容wps 的水平方向上也居中
+    //     cell.ht = 0;
+    // }
+    if (vt == "middle") {
+        cell.vt = 0;
+    } else if (vt == "top" || vt == "text-top") {
+        cell.vt = 1;
+    } else {
+        cell.vt = 2;
+    }
+    return cell;
+
+}
+  function get_paste_cell_style_two_tag($td, cell,styleMap){
+    // 给只有两个标签 这种情况获取样式 
+    
+    //hz_flag 
+    //  debugger;  
+    let fontSize = null;
+    let fontFamily = null;
+    let fontWeight = null;
+    
+    const locale_fontjson = locale().fontjson;
+    try {
+        let classNames_dom = $td.attr("class");
+        let classNames = null;
+        if (classNames_dom) {
+            classNames = classNames_dom.split(/\s+/); //获取到该单元格类名
+        }
+        try {
+            if (classNames && styleMap.hasOwnProperty(classNames[0]) && styleMap[classNames[0]].hasOwnProperty('font-size')) {
+                fontSize = styleMap[classNames[0]]['font-size'];
+                fontSize = fontSize ? parseInt(fontSize, 10) : null;
+            } else {
+                // debugger;
+                fontSize = get_property_from_next($td, "font-size")
+            }
+            if (classNames && styleMap.hasOwnProperty(classNames[0]) && styleMap[classNames[0]].hasOwnProperty('font-weight')) {
+                fontWeight = styleMap[classNames[0]]['font-weight'];
+            } else {
+                fontWeight = get_property_from_next($td, "fontWeight");
+            }
+            if (classNames && styleMap.hasOwnProperty(classNames[0]) && styleMap[classNames[0]].hasOwnProperty('font-family')) {
+                fontFamily = styleMap[classNames[0]]['font-family'];
+            } else {
+                fontFamily = get_property_from_next($td, "font-family");
+            }
+        } catch (error) {
+            fontSize = fontSize ? fontSize :$td.find('p').css('font-size');
+            fontWeight =fontWeight? fontWeight: $td.find('p').css('fontWeight');
+            fontFamily = fontFamily ?fontFamily:$td.find('p').css('font-family');
+        }
+        if (fontSize) {
+            if (fontSize.endsWith("px")) {
+                // debugger;
+                let pxValue = parseInt(fontSize, 10);
+                fontSize = Math.round(pxValue / 1.333);
+            } else {
+                fontSize = parseInt(fontSize, 10);
+            }
+        }
+    } catch (error) {
+        // console.log(1);
+    }
+
+
+
+    
+    let bg = $td.css("background-color")
+    if (bg == "rgba(0, 0, 0, 0)") {
+        bg = null;
+    }
+    // if(backgroundColor){
+    //     bg = backgroundColor;
+    // }
+    cell.bg = bg;
+
+    
+    let bl = get_property_from_next($td, "font-weight")
+    if (bl == 400 || bl == "normal" || bl == '400') {
+        cell.bl = 0;
+    } else {
+        cell.bl = 1;
+    }
+
+    // 检测下划线
+    
+    let un = $td.css("text-decoration");
+    if (un.indexOf("underline") != -1) {
+        cell.un = 1;
+    }
+
+    
+    let it = $td.css("font-style");
+    if (it == "normal") {
+        cell.it = 0;
+    } else {
+        cell.it = 1;
+    }
+
+    
+    // let ff = $td.css("font-family");
+    // let ffs = ff.split(",");
+    //debugger;
+    // for (let i = 0; i < ffs.length; i++) {
+    //     let fa = ffs[i].replace(/"/g, "").trim().toLowerCase();
+    //     if(fontFamily){
+    //         fa = fontFamily;
+    //     }
+    //     // let fa = $.trim(ffs[i].toLowerCase());
+    //     fa = locale_fontjson[fa];
+    //     if (fa == null) {
+    //         cell.ff = 4; // hz_flag  默认改成微软雅黑
+    //     } else {
+    //         cell.ff = fa;
+    //         break;
+    //     }
+    // }
+    // debugger;
+    // console.log("Microsoft YaHei")
+    // console.log(fontFamily)
+    // console.log(locale_fontjson);
+    // console.log(locale_fontjson[fontFamily]);
+
+    if (fontFamily) { // hz-flag 相似类型的都是hz-flag
+        if(fontFamily.indexOf(",") !== -1) {
+            fontFamily = '微软雅黑';
+        }
+      
+    }else {
+        fontFamily = '微软雅黑';
+    }
+    let lowerCaseFontFamily = fontFamily.toLowerCase();
+    fa = locale_fontjson[lowerCaseFontFamily];
+    if (fa || fa ===0){
+        cell.ff = fa;
+    }else {
+        cell.ff = 4;
+    }
+    
+
+    // let fs = Math.round((parseInt($td.css("font-size")) * 72) / 96);
+    // console.log($td.css("font-size"))
+    // console.log($td.css())
+    // let style = window.getComputedStyle($td[0]);
+    // let fontSizePattern = /font-size:\s*([\d.]+)pt/;
+    // let match = fontSizePattern.exec($td.attr("style"));
+    // //debugger;
+    // if (match && match[1]) {
+    //     let fs = parseFloat(match[1]);
+    //     console.log("Inline 字体大小(磅(pt)): ", fs);
+    // } else {
+    //     console.log("未找到对应的font-size属性");
+    // }
+    // let wpsFontSize = Math.round((fs * 16) / 12);
+    // let excelFontSize = Math.round((fs * 12) / 9);
+    // if (wpsFontSize >= 12) {
+    //   fs = wpsFontSize;
+    // } else {
+    //   fs = excelFontSize;
+    // }
+    // debugger;
+    let fs = Math.round((parseInt($td.css("font-size")) * 72) / 96);
+    if (fontSize) {
+        fs = fontSize;
+    }
+
+    cell.fs = fs;
+
+    
+    let fc = get_property_from_next($td, "color");
+    cell.fc = fc;
+
+      // 垂直对齐属性
+
+      let vt = $td.css("vertical-align");
+
+      // if(vt == "middle" && !ht  || (!ht && (vt == "top" || vt == "text-top")) ){ // 如果水平方向的获取不到，但是垂直方向是居中，兼容wps 的水平方向上也居中
+      //     cell.ht = 0;
+      // }
+      if (vt == "middle") {
+          cell.vt = 0;
+      } else if (vt == "top" || vt == "text-top") {
+          cell.vt = 1;
+      } else {
+          cell.vt = 2;
+      }
+      // 水平对齐属性
+
+      let ht = $td.css("text-align");
+      if (ht == "center") {
+          cell.ht = 0;
+      } else if (ht == "right") {
+          cell.ht = 2;
+      } else {
+          cell.ht = 1;
+      }
+
+
+    return cell;
+
+}
+
+function get_property_from_next($td , property){
+    // 从当前元素 寻找，没有从子元素，再次时从孩子的孩子元素获取
+    // 优先使用最后一代的样式
+    let property_value = null;
+    let property_value_td = null;
+    let property_value_td_child = null;
+    property_value_td = $td.css(property);
+    if (property ==='font-family' &&  property_value.indexOf(",") !== -1) { // 这个可能会获取到多个字体
+        property_value = null;
+        // 如果该元素存在子标签，从第一个子标签获取
+        property_value = $td.children().first().css(property);
+        if (property_value.indexOf(",") !== -1) {
+            // 如果存在下一个标签，再从下一个标签获取
+            property_value = null;
+            // 获取下一个标签的字体名称
+            var $nextElement = $td.children().first().children();
+            if ($nextElement.length > 0) {
+                property_value = $nextElement.css(property);
+            }
+        }
+        return property_value;
+    }else {  // 除字体以外的其他属性
+        // 如果该元素存在子标签，从第一个子标签获取,但是优先获取最后一代的数据
+        property_value_td_child = $td.children().first().css(property);
+        // 如果存在下一个标签，再从下一个标签获取
+        property_value = null;
+        // 获取下一个标签的字体名称
+        var $nextElement = $td.children().first().children();
+        if ($nextElement.length > 0) {
+            property_value = $nextElement.css(property);
+        }
+    }
+    if (property_value_td_child && (property_value !==0) && !(property_value) ){ // 如果property_value没有获取到，采用property_value_td
+        return  property_value_td_child;
+    }else if(property_value_td && (property_value !==0) && !(property_value) ){
+        return property_value_td;
+    }
+    return property_value;
+}
+// function get_td_width_and_height($tr){
+//     debugger;
+//     // 尝试从当前元素中获取行高和列宽，
+//     let r_and_c = [null,null]; // 第一个元素是行高，第二个是列宽
+//     let row_h = $tr.style.heigt;
+//     let col_w = $tr.style.width;
+
+//     if(row_h && row_h.endsWith("px")){
+//         let pxValue = parseInt(row_h, 10);
+//         row_h = Math.round(pxValue / 1.333);
+//     }else {
+//         row_h = row_h?parseInt(row_h, 10):row_h;
+//     }
+
+//     // 处理列宽
+//     if(col_w && col_w.endsWith("px")){
+//         let pxValue = parseInt(col_w, 10);
+//         col_w = Math.round(pxValue / 1.333);
+//     }else {
+//         col_w = col_w?parseInt(col_w, 10):col_w;
+//     }
+
+//     r_and_c[0] = (row_h);
+//     r_and_c[1] = (col_w);
+//     return  JSON.parse(JSON.stringify(r_and_c));
+// }
+function handle_pt_or_px(property) {
+    // 将pt 处理成px
+    if (property && property.endsWith("pt")) {
+      let ptValue = parseInt(property, 10);
+      property = Math.round(ptValue * 1.333);
+    } else {
+      property = property ? parseInt(property, 10) : property;
+    }
+    return property;
+  }
+  
 // 协同编辑其他用户不在操作的时候，且已经展示了用户名10秒，则用户名框隐藏
 function hideUsername() {
     let $showEle = $$(".luckysheet-multipleRange-show");

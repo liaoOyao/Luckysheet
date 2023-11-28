@@ -16,7 +16,7 @@ import { replaceHtml, getObjType, luckysheetfontformat } from "../utils/util";
 import Store from "../store";
 import locale from "../locale/locale";
 import imageCtrl from "./imageCtrl";
-
+import {getDefaultRowHeight,getDefaultColWidth} from '../global/api'
 const selection = {
     clearcopy: function(e) {  // 双击单元格触发
         // debugger;
@@ -105,8 +105,8 @@ const selection = {
             colIndexArr = [];
         let copyRange = [],
             RowlChange = false,
-            HasMC = false;
-
+            HasMC = false,
+            CollChange = false; // hz_flag 列宽改变
         for (let s = 0; s < Store.luckysheet_select_save.length; s++) {
             let range = Store.luckysheet_select_save[s];
 
@@ -123,16 +123,17 @@ const selection = {
                 if (!rowIndexArr.includes(copyR)) {
                     rowIndexArr.push(copyR);
                 }
-
                 if (Store.config["rowlen"] != null && copyR in Store.config["rowlen"]) {
                     RowlChange = true;
                 }
-
+                
                 for (let copyC = c1; copyC <= c2; copyC++) {
                     if (Store.config["colhidden"] != null && Store.config["colhidden"][copyC] != null) {
                         continue;
                     }
-
+                    if (Store.config["columnlen"] != null && copyC in Store.config["columnlen"]) {
+                        CollChange = true;
+                    }
                     if (!colIndexArr.includes(copyC)) {
                         colIndexArr.push(copyC);
                     }
@@ -156,6 +157,7 @@ const selection = {
             dataSheetIndex: Store.currentSheetIndex,
             copyRange: copyRange,
             RowlChange: RowlChange,
+            CollChange: CollChange,
             HasMC: HasMC,
         };
 
@@ -188,7 +190,12 @@ const selection = {
                 Store.config["rowlen"] == null ||
                 Store.config["rowlen"][r.toString()] == null
             ) {
-                cpdata += '<tr height="19">';
+                // config 没有时，获取默认行高
+                let DefaultRowHeight = getDefaultRowHeight();
+                if(!DefaultRowHeight){
+                    DefaultRowHeight =  40;
+                }
+                cpdata += `<tr height="${DefaultRowHeight}px">`;
             } else {
                 cpdata += `<tr height="${Store.config["rowlen"][r.toString()]}">`;
             }
@@ -202,7 +209,12 @@ const selection = {
                         Store.config["columnlen"] == null ||
                         Store.config["columnlen"][c.toString()] == null
                     ) {
-                        colgroup += '<col width="72px"></col>';
+                          // config 没有时，获取默认列宽
+                        let DefaultColWidth = getDefaultColWidth();
+                        if (!DefaultColWidth) {
+                            DefaultColWidth = 120;
+                        }
+                        colgroup += `<col width="${DefaultColWidth}px"></col>`;
                     } else {
                         colgroup += '<col width="' + Store.config["columnlen"][c.toString()] + 'px"></col>';
                     }
@@ -652,7 +664,7 @@ const selection = {
             }
         }, 10);
     },
-    pasteHandler: function(data, borderInfo, rowlen, columnlen) {  // 行高和列宽
+    pasteHandler: function(data, borderInfo, rowlen, columnlen) {  // hz_flag 增加了行高和列宽 属性
         if (!checkProtectionLockedRangeList(Store.luckysheet_select_save, Store.currentSheetIndex)) {
             return;
         }
@@ -742,11 +754,14 @@ const selection = {
             }
             if (JSON.stringify(rowlen).length > 2) {
                 RowlChange = true;
+                // 合并rowlen到cfg.rowlen
+                cfg["rowlen"] = { ...cfg["rowlen"], ...rowlen };
             }
 
             if (JSON.stringify(columnlen).length > 2) {
-                cfg["columnlen"] = {};
                 CollChange = true;
+                // 合并rowlen到cfg.rowlen
+                cfg["columnlen"] = { ...cfg["columnlen"], ...columnlen };
             }
             let offsetMC = {};
             for (let h = minh; h <= maxh; h++) {
@@ -806,7 +821,6 @@ const selection = {
 
                         cfg["borderInfo"].push(bd_obj);
                     }
-
                     let fontset = luckysheetfontformat(x[c]);
                     let oneLineTextHeight = menuButton.getTextSize("田", fontset)[1];
                     //比较计算高度和当前高度取最大高度 hz-flag
@@ -950,7 +964,6 @@ const selection = {
         if (cfg["merge"] == null) {
             cfg["merge"] = {};
         }
-
         //复制范围
         let copyHasMC = copyRange["HasMC"];
         let copyRowlChange = copyRange["RowlChange"];
@@ -1402,8 +1415,8 @@ const selection = {
                     {},
                     Store.luckysheetfile[getSheetIndex(Store.currentSheetIndex)]["dataVerification"],
                 ),
-                curDataVerification: dataVerification,
                 range: {
+                    curDataVerification: dataVerification,
                     row: [minh, maxh],
                     column: [minc, maxc],
                 },
@@ -1428,10 +1441,16 @@ const selection = {
         if (cfg["merge"] == null) {
             cfg["merge"] = {};
         }
-
+        if (cfg["rowlen"] == null) {
+            cfg["rowlen"] = {};
+        }
+        if (cfg["columnlen"] == null) {
+            cfg["columnlen"] = {};
+        }
         //复制范围
         let copyHasMC = copyRange["HasMC"];
         let copyRowlChange = copyRange["RowlChange"];
+        let copyCollChange = copyRange["CollChange"]; // hz_flag  列宽改变
         let copySheetIndex = copyRange["dataSheetIndex"];
 
         let c_r1 = copyRange["copyRange"][0].row[0],
@@ -1522,6 +1541,31 @@ const selection = {
                 );
             }
             return;
+        }
+
+        // hz_falg  将复制的数据的行高和列宽移植到 当前选区范围的单元格数据的数据配置中
+        // 1、移植行高
+        // debugger;
+        let c_r1_temp = c_r1;
+        for (let i = minh; i <= maxh; i++) {
+            if (copyRowlChange) {
+                if (c_r1 in cfg["rowlen"]) {
+                    cfg["rowlen"][i] = cfg["rowlen"][c_r1]
+                }
+                c_r1_temp++;
+
+            }
+        }
+        // 移植列宽
+        // debugger;
+        let c_c1_temp = c_c1;
+        for (let i = minc; i <= maxc; i++) {
+            if (copyCollChange) {
+                if (c_r1 in cfg["columnlen"]) {
+                    cfg["columnlen"][i] = cfg["columnlen"][c_r1]
+                }
+                c_c1_temp++;
+            }
         }
 
         let timesH = (maxh - minh + 1) / copyh;
@@ -1738,13 +1782,15 @@ const selection = {
 
         last["row"] = [minh, maxh];
         last["column"] = [minc, maxc];
-
-        if (copyRowlChange || addr > 0 || addc > 0) {
+        // hz_flag
+        if (copyRowlChange || addr > 0 || addc > 0 || copyCollChange) {
+            console.log(JSON.parse(JSON.stringify(cfg)));
             cfg = rowlenByRange(d, minh, maxh, cfg);
 
             let allParam = {
                 cfg: cfg,
                 RowlChange: true,
+                CollChange:copyCollChange,
                 cdformat: cdformat,
                 dataVerification: dataVerification,
             };
@@ -1772,10 +1818,16 @@ const selection = {
         if (cfg["merge"] == null) {
             cfg["merge"] = {};
         }
-
+        if (cfg["rowlen"] == null) {
+            cfg["rowlen"] = {};
+        }
+        if (cfg["columnlen"] == null) {
+            cfg["columnlen"] = {};
+        }
         //复制范围
         let copyHasMC = copyRange["HasMC"];
         let copyRowlChange = copyRange["RowlChange"];
+        let copyCollChange = copyRange["CollChange"];
         let copySheetIndex = copyRange["dataSheetIndex"];
 
         let c_r1 = copyRange["copyRange"][0].row[0],
@@ -1822,6 +1874,28 @@ const selection = {
             maxc = minc + copyc - 1;
         }
 
+         // hz_falg  将复制的数据的行高和列宽移植到 当前选区范围的单元格数据的数据配置中
+         // 1、移植行高
+         let c_r1_temp = c_r1;
+        for (let i = minh; i <= maxh; i++) {
+            if (copyRowlChange) {
+                if (c_r1 in cfg["rowlen"]) {
+                    cfg["rowlen"][i] = cfg["rowlen"][c_r1]
+                }
+                c_r1_temp++;
+
+            }
+        }
+        // 移植列宽
+        let c_c1_temp = c_c1;
+        for (let i = minc; i <= maxc; i++) {
+            if (copyCollChange) {
+                if (c_r1 in cfg["columnlen"]) {
+                    cfg["columnlen"][i] = cfg["columnlen"][c_r1]
+                }
+                c_c1_temp++;
+            }
+        }
         let timesH = Math.ceil((maxh - minh + 1) / copyh); //复制行 组数
         let timesC = Math.ceil((maxc - minc + 1) / copyc); //复制列 组数
 
@@ -2046,12 +2120,15 @@ const selection = {
         last["row"] = [minh, maxh];
         last["column"] = [minc, maxc];
 
-        if (copyRowlChange) {
+       
+
+        if (copyRowlChange || copyCollChange) {
             cfg = rowlenByRange(d, minh, maxh, cfg);
 
             let allParam = {
                 cfg: cfg,
                 RowlChange: true,
+                CollChange: copyCollChange,
                 cdformat: cdformat,
                 dataVerification: dataVerification,
             };
