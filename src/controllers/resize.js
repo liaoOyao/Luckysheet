@@ -60,12 +60,20 @@ export default function luckysheetsizeauto(isRefreshCanvas=true) {
     // 公式栏
     const formulaEle = document.querySelector("#" + Store.container + ' .luckysheet-wa-calculate');
     if (!luckysheetConfigsetting.sheetFormulaBar) {
-        formulaEle.style.display = 'none';
-        Store.calculatebarHeight = 0;
+        if(formulaEle){
+            formulaEle.style.display = 'none';
+            Store.calculatebarHeight = 0;
+        }else if(Store.calculatebarHeight == 0){
+            Store.calculatebarHeight = 0;
+        }
     }
     else {
-        formulaEle.style.display = 'block';
-        Store.calculatebarHeight = formulaEle.offsetHeight;
+        if(formulaEle){
+            formulaEle.style.display = 'block';
+            Store.calculatebarHeight = formulaEle.offsetHeight;
+        }else{
+            Store.calculatebarHeight = 23; // hz_falg
+        }
     }
 
     $("#" + Store.container).find(".luckysheet-grid-container").css("top", Store.toolbarHeight + Store.infobarHeight + Store.calculatebarHeight);

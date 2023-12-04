@@ -22,7 +22,6 @@ import luckysheetConfigsetting from './luckysheetConfigsetting';
 import { customImageUpdate } from './imageUpdateCtrl';
 import method from '../global/method';
 import { ws_unzip, arrayBufferToBase64 } from '../utils/handle_data';
-import { v4 as uuidv4 } from 'uuid';
 const server = {
 	gridKey: null,
 	loadUrl: null,
@@ -220,22 +219,22 @@ const server = {
 		}
 
 	},
-	websocket: null,
 	wxErrorCount: 0,
+	wxErrorCounFlag: false, // 标记是否发送过错误提醒
+	wxCloseCounFlag: false,
+	wxCloseCount: 0,// 标记关闭的次数
+	wxCloseCounMoreFlag: false,
+	wxErrorCounMoreFlag: false,
+	websocket: null,
 	openWebSocket: function () {
 		let _this = this;
-		//添加用户标记
-		const uuid = uuidv4();
+
 		if ('WebSocket' in window) {
 			let wxUrl = _this.updateUrl + "?t=111&g=" + encodeURIComponent(_this.gridKey);
 			if (_this.updateUrl.indexOf('?') > -1) {
 				wxUrl = _this.updateUrl + "&t=111&g=" + encodeURIComponent(_this.gridKey) + "&deviceId=" + window.navigator.userAgent;
 			}
 
-
-			// 需要添加自定义属性
-			wxUrl += "&wid=" + uuid;
-	
 			_this.websocket = new WebSocket(wxUrl);
 			
 	
@@ -243,8 +242,12 @@ const server = {
 			_this.websocket.onopen = function () {
 				console.info(locale().websocket.success);
 				hideloading();
-				_this.wxErrorCount = 0;
-
+				// _this.wxErrorCount = 0;
+				// _this.wxCloseCounFlag = false;
+				// _this.wxCloseCounMoreFlag = false;
+				// _this.wxErrorCounFlag = false;
+				// _this.wxErrorCounMoreFlag = false;
+				// _this.wxCloseCount = 0;
 				//防止websocket长时间不发送消息导致断连
 				if (_this.retryTimer) { // 清除之前的定时器
 					clearInterval(_this.retryTimer);
@@ -439,29 +442,69 @@ const server = {
 			//通信发生错误时触发
 			_this.websocket.onerror = function () {
 				_this.wxErrorCount++;
-
-				if (_this.wxErrorCount > 3) {
-					showloading(locale().websocket.refresh);
+				if ((_this.wxErrorCount > 3) && !(_this.wxErrorCounMoreFlag) && !(_this.wxCloseCounFlag)) {
+					// 在适当的时机调用sendMessage发送消息
+					_this.wxErrorCounMoreFlag = true;
+					_this.wxCloseCounFlag = true;
+					const message = {  // 产生多次错误的消息，但是只发一次
+						"type": -4,
+						"message": locale().websocket.refresh,
+					}
+					sendMessage(message);
+					// showloading(locale().websocket.refresh);
 				}
-				else {
-					showloading(locale().websocket.wait);
-					_this.openWebSocket();
+				else if (!(_this.wxErrorCounFlag)) {
+					_this.wxErrorCounFlag = true;
+					const message = {  // 产生多次错误的消息，但是只发一次
+						"type": -3,
+						"message": locale().websocket.wait,
+					}
+					sendMessage(message);
+					_this.openWebSocket();// 重新连接,小于3次时再次尝试
+					// showloading(locale().websocket.wait);
 				}
 			}
 
 			//连接关闭时触发
 			_this.websocket.onclose = function (e) {
 				console.info(locale().websocket.close);
+				debugger;
 				if (e.code === 1000) {
 					clearInterval(_this.retryTimer)
 					_this.retryTimer = null
 				} else {
-					alert(locale().websocket.contact);
+					// alert(locale().websocket.contact);
+					// 异常的关闭
+					_this.wxCloseCount++;
+					if(_this.wxCloseCount > 3 && !_this.wxCloseCounMoreFlag){
+						_this.wxCloseCounMoreFlag = true;
+						const message = {  // 多次产生多次关闭的消息 ，但是只发一次
+							"type": -2,
+							"message": locale().websocket.contact,
+						}
+						// 在适当的时机调用sendMessage发送消息
+						sendMessage(message);
+					}else if(!_this.wxCloseCounFlag) { // 不少于3次关闭消息，但是只发送一次关闭消息
+						_this.wxCloseCounFlag = true;
+						const message = {
+							"type": -1,
+							"message": locale().websocket.contact,
+						}
+						// 在适当的时机调用sendMessage发送消息
+						sendMessage(message);
+					}
 				}
 	        }
 	    }
 	    else{
-	        alert(locale().websocket.support);
+				
+	        // alert(locale().websocket.support);
+					const message = {
+						"type":-6,
+						"message":locale().websocket.support,
+				}
+					// 在适当的时机调用sendMessage发送消息
+					sendMessage(message);
 	    }
     },
     wsUpdateMsg: function(item) {
@@ -1496,5 +1539,13 @@ const server = {
         })
     }
 }
+// 发送消息给父窗口
+function sendMessage(message) {
+	debugger;
+	console.log(window.location.origin);
+  window.postMessage(message,window.location.origin );
+}
+
+
 
 export default server;
