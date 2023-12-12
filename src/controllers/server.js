@@ -235,12 +235,24 @@ const server = {
 				wxUrl = _this.updateUrl + "&t=111&g=" + encodeURIComponent(_this.gridKey) + "&deviceId=" + window.navigator.userAgent;
 			}
 
+				// 如果 window.top.excel_wsocket 存在，则说明在excel中打开，此时重新连接
+			if (window.top.excel_wsocket) {
+				try {
+					window.top.excel_wsocket.close();
+					window.top.excel_wsocket = null;
+					console.log("excel_wsocket 存在，已经清除，即将重新连接");
+				}catch (e) {
+					console.log("excel_wsocket 存在，已经清除，即将重新连接失败");
+				}
+			}
 			_this.websocket = new WebSocket(wxUrl);
-			
+			window.top.excel_wsocket =  _this.websocket
+			// hz_flag  
+		
 	
 			//连接建立时触发
 			_this.websocket.onopen = function () {
-				console.info(locale().websocket.success);
+				// console.info(locale().websocket.success);
 				hideloading();
 				// _this.wxErrorCount = 0;
 				// _this.wxCloseCounFlag = false;
@@ -254,7 +266,9 @@ const server = {
 					_this.retryTimer = null;
 				}
 				_this.retryTimer = setInterval(function () {
-					_this.websocket.send("rub");
+					if (_this.websocket.readyState == WebSocket.OPEN) {
+						_this.websocket.send("rub");
+					}
 				}, 60000);
 			}
 
@@ -419,11 +433,13 @@ const server = {
 
 					// After editing by multiple people, data.data may appear as an empty string
 					let items = data.data === "" ? data.data : JSON.parse(data.data);
-
+debugger;
 					for (let i = 0; i < items.length; i++) {
-						_this.wsUpdateMsg(item[i]);
+						
+						_this.wsUpdateMsg(items[i]);
 					}
-				} else if (type == 5) {
+				} 
+				else if (type == 5) {
 					showloading(data.data);
 				} else if (type == 6) {
 					hideloading();
@@ -453,7 +469,7 @@ const server = {
 					sendMessage(message);
 					// showloading(locale().websocket.refresh);
 				}
-				else if (!(_this.wxErrorCounFlag)) {
+				else if (!(_this.wxErrorCounFlag) && !(_this.wxErrorCounMoreFlag) &&!(_this.wxCloseCounFlag)) {  // 防止重复发送错误消息
 					_this.wxErrorCounFlag = true;
 					const message = {  // 产生多次错误的消息，但是只发一次
 						"type": -3,
@@ -468,7 +484,6 @@ const server = {
 			//连接关闭时触发
 			_this.websocket.onclose = function (e) {
 				console.info(locale().websocket.close);
-				debugger;
 				if (e.code === 1000) {
 					clearInterval(_this.retryTimer)
 					_this.retryTimer = null
@@ -508,6 +523,7 @@ const server = {
 	    }
     },
     wsUpdateMsg: function(item) {
+			debugger;
 	    let type = item.t,
 	        index = item.i,
 	        value = item.v;
@@ -517,12 +533,12 @@ const server = {
 	    if(["v","rv","cg","all","fc","drc","arc","f","fsc","fsr","sh","c"].includes(type) && file == null){
 	        return;
 	    }
-
+debugger;
 	    if(type == "v"){ //单个单元格数据更新
 	        if(file.data == null || file.data.length == 0){
 	            return;
 	        }
-
+debugger;
 	        let r = item.r, c = item.c;
 	        file.data[r][c] = value;
 
@@ -544,6 +560,7 @@ const server = {
 	        }
 	    }
 		else if(type == "rv"){ //范围单元格数据更新
+			debugger;
 			if(Object.keys(item.range).length > 0) {
 				Store.cooperativeEdit.merge_range = item.range
 				Store.cooperativeEdit.merge_range.v = item.v
@@ -764,6 +781,7 @@ const server = {
 	        }, 1);
 	    }
 	    else if(type == "drc"){ //删除行列
+				debugger;
 	        if(file.data == null || file.data.length == 0){
 	            return;
 	        }
@@ -781,30 +799,31 @@ const server = {
 	            data.splice(st_i, len);
 
 	            //空白行模板
-	            let row = [];
-	            for (let c = 0; c < data[0].length; c++) {
-	                row.push(null);
-	            }
-
-	            //删除多少行，增加多少行空白行
-	            for (let r = 0; r < len; r++) {
-	                data.push(row);
-	            }
+	            // let row = [];
+	            // for (let c = 0; c < data[0].length; c++) {
+	            //     row.push(null);
+	            // }
+							// debugger;
+	            // //删除多少行，增加多少行空白行
+	            // for (let r = 0; r < len; r++) {
+	            //     data.push(row);
+	            // }
 	        }
 	        else{
 	            file["column"] -= len;
 
-	            //空白列模板
-	            let addcol = [];
-	            for (let r = 0; r < len; r++) {
-	                addcol.push(null);
-	            }
-
+	            // //空白列模板
+	            // let addcol = [];
+	            // for (let r = 0; r < len; r++) {
+	            //     addcol.push(null);
+	            // }
+debugger;
 	            for(let i = 0; i < data.length; i++){
 	                data[i].splice(st_i, len);
 
-	                data[i] = data[i].concat(addcol);
+	                // data[i] = data[i].concat(addcol);
 	            }
+							debugger;
 	        }
 
 	        for(let x in mc){
@@ -828,6 +847,7 @@ const server = {
 	        }
 	    }
 	    else if(type == "arc"){ //增加行列
+				debugger;
 	        if(file.data == null || file.data.length == 0){
 	            return;
 	        }
@@ -849,7 +869,7 @@ const server = {
 				for(let c = 0; c < data[0].length; c++){
 					row.push(null);
 				}
-
+debugger;
 	            let arr = [];
 	            for(let i = 0; i < len; i++){
 					if(addData[i] == null){
@@ -861,6 +881,7 @@ const server = {
 				}
 
 				if(direction == "lefttop"){
+					debugger;
 					if(st_i == 0){
 						new Function("data","return " + 'data.unshift(' + arr.join(",") + ')')(data);
 					}
@@ -874,7 +895,7 @@ const server = {
 	        }
 	        else{
 				file["column"] += len;
-
+debugger;
 	            for(let i = 0; i < data.length; i++){
 					/* 在每一行的指定位置都插入一列 */
 					for (let j = 0; j < len; j++) {
@@ -898,6 +919,7 @@ const server = {
 
 	        if(index == Store.currentSheetIndex){
 				Store.flowdata = data;
+				debugger;
 				editor.webWorkerFlowDataCache(Store.flowdata);//worker存数据
 
 	            Store.config["merge"] = mc;
@@ -1541,8 +1563,6 @@ const server = {
 }
 // 发送消息给父窗口
 function sendMessage(message) {
-	debugger;
-	console.log(window.location.origin);
   window.postMessage(message,window.location.origin );
 }
 

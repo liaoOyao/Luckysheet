@@ -809,8 +809,17 @@ function luckysheetDrawMain(scrollWidth, scrollHeight, drawWidth, drawHeight, of
         else {
             start_r = Store.visibledatarow[r - 1] - scrollHeight - 1;
         }
-        end_r = Store.visibledatarow[r+mainCell["mc"].rs-1] - scrollHeight;
-        end_c = Store.visibledatacolumn[c+mainCell["mc"].cs-1] - scrollWidth;
+        if (mainCell && mainCell["mc"] ) { // hz_flag
+            if("rs" in mainCell["mc"]){
+                end_r = Store.visibledatarow[r + mainCell["mc"].rs - 1] - scrollHeight;
+            }
+            if("cs" in mainCell["mc"]){
+                end_c = Store.visibledatacolumn[c + mainCell["mc"].cs - 1] - scrollWidth;
+            }
+       
+          } 
+        // end_r = Store.visibledatarow[r+mainCell["mc"].rs-1] - scrollHeight;
+        // end_c = Store.visibledatacolumn[c+mainCell["mc"].cs-1] - scrollWidth;
 
         if(value == null || value.toString().length == 0){
             nullCellRender(r, c, start_r, start_c, end_r, end_c,luckysheetTableContent,af_compute, cf_compute,offsetLeft,offsetTop,dynamicArray_compute,cellOverflowMap, dataset_col_st, dataset_col_ed,scrollHeight,scrollWidth,bodrder05, true);

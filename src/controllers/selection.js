@@ -92,13 +92,14 @@ const selection = {
         return style + color + ";";
     },
     copy: function(e) {  // hz-tag 复制
+        // debugger;
         //copy事件
         let clipboardData = window.clipboardData; //for IE
         if (!clipboardData) {
             // for chrome
             clipboardData = e.originalEvent.clipboardData;
         }
-
+        // debugger;
         Store.luckysheet_selection_range = [];
         //copy范围
         let rowIndexArr = [],
@@ -149,7 +150,7 @@ const selection = {
             Store.luckysheet_selection_range.push({ row: range.row, column: range.column });
             copyRange.push({ row: range.row, column: range.column });
         }
-
+        // debugger;
         selectionCopyShow();
 
         //luckysheet内copy保存
@@ -160,6 +161,7 @@ const selection = {
             CollChange: CollChange,
             HasMC: HasMC,
         };
+        // debugger;
 
         //copy范围数据拼接成table 赋给剪贴板
         let _this = this;
@@ -563,10 +565,12 @@ const selection = {
         if (!clipboardData) {
             let textarea = $("#luckysheet-copy-content");
             textarea.html(cpdata);
+            console.log(textarea);
             textarea.focus();
             textarea.select();
             document.execCommand("selectAll");
             document.execCommand("Copy");
+
 
             // 等50毫秒，keyPress事件发生了再去处理数据
             setTimeout(function() {
@@ -781,12 +785,11 @@ const selection = {
                         delete x[c].mc;
                     }
 
-                    let value = null;
+                    let value = null; // 获取对应的值
                     if (data[h - minh] != null && data[h - minh][c - minc] != null) {
                         value = data[h - minh][c - minc];
                     }
-
-                    x[c] = $.extend(true, {}, value);
+                    x[c] = $.extend(true, {}, value);  // 从处理好的data 里面获取到 单元格的值这些
 
                     if (value != null && "mc" in x[c]) {
                         if (x[c]["mc"].rs != null) {
@@ -1433,11 +1436,17 @@ const selection = {
         if (!checkProtectionLockedRangeList(Store.luckysheet_select_save, Store.currentSheetIndex)) {
             return;
         }
-
+        // hz_flag  标识 复制的对象的sheetindex 
+        let copySheetIndex = copyRange["dataSheetIndex"];
         const _locale = locale();
         const locale_paste = _locale.paste;
-
         let cfg = $.extend(true, {}, Store.config);
+        let cfg_copy = null;
+        // debugger;
+        if (copySheetIndex &&  Store.currentSheetIndex !== copySheetIndex){
+            cfg_copy =  $.extend(true, {},Store.luckysheetfile[getSheetIndex(copySheetIndex)]["config"]);
+        }
+        
         if (cfg["merge"] == null) {
             cfg["merge"] = {};
         }
@@ -1451,7 +1460,7 @@ const selection = {
         let copyHasMC = copyRange["HasMC"];
         let copyRowlChange = copyRange["RowlChange"];
         let copyCollChange = copyRange["CollChange"]; // hz_flag  列宽改变
-        let copySheetIndex = copyRange["dataSheetIndex"];
+        
 
         let c_r1 = copyRange["copyRange"][0].row[0],
             c_r2 = copyRange["copyRange"][0].row[1],
@@ -1544,29 +1553,54 @@ const selection = {
         }
 
         // hz_falg  将复制的数据的行高和列宽移植到 当前选区范围的单元格数据的数据配置中
-        // 1、移植行高
-        // debugger;
-        let c_r1_temp = c_r1;
-        for (let i = minh; i <= maxh; i++) {
-            if (copyRowlChange) {
-                if (c_r1 in cfg["rowlen"]) {
-                    cfg["rowlen"][i] = cfg["rowlen"][c_r1]
-                }
-                c_r1_temp++;
+        
+        if(!cfg_copy){  // 一个sheet 内部复制
+       // 1、移植行高
+            let c_r1_temp = c_r1;
+            for (let i = minh; i <= maxh; i++) {
+                if (copyRowlChange) {
+                    if (c_r1_temp in cfg["rowlen"]) {
+                        cfg["rowlen"][i] = cfg["rowlen"][c_r1_temp]
+                    }
+                    c_r1_temp++;
 
-            }
-        }
-        // 移植列宽
-        // debugger;
-        let c_c1_temp = c_c1;
-        for (let i = minc; i <= maxc; i++) {
-            if (copyCollChange) {
-                if (c_r1 in cfg["columnlen"]) {
-                    cfg["columnlen"][i] = cfg["columnlen"][c_r1]
                 }
-                c_c1_temp++;
+            }
+            // 移植列宽
+            // debugger;
+            let c_c1_temp = c_c1;
+            for (let i = minc; i <= maxc; i++) {
+                if (copyCollChange) {
+                    if (c_c1_temp in cfg["columnlen"]) {
+                        cfg["columnlen"][i] = cfg["columnlen"][c_c1_temp]
+                    }
+                    c_c1_temp++;
+                }
+            }
+        }else{  // 不同的sheet之间复制
+            let c_r1_temp = c_r1;
+            for (let i = minh; i <= maxh; i++) {
+                if (copyRowlChange) {
+                    if (c_r1_temp in cfg_copy["rowlen"]) {
+                        cfg["rowlen"][i] = cfg_copy["rowlen"][c_r1_temp]
+                    }
+                    c_r1_temp++;
+
+                }
+            }
+            // 移植列宽
+            // debugger;
+            let c_c1_temp = c_c1;
+            for (let i = minc; i <= maxc; i++) {
+                if (copyCollChange) {
+                    if (c_c1_temp in cfg_copy["columnlen"]) {
+                        cfg["columnlen"][i] = cfg_copy["columnlen"][c_c1_temp]
+                    }
+                    c_c1_temp++;
+                }
             }
         }
+ 
 
         let timesH = (maxh - minh + 1) / copyh;
         let timesC = (maxc - minc + 1) / copyc;
@@ -1784,8 +1818,10 @@ const selection = {
         last["column"] = [minc, maxc];
         // hz_flag
         if (copyRowlChange || addr > 0 || addc > 0 || copyCollChange) {
-            console.log(JSON.parse(JSON.stringify(cfg)));
-            cfg = rowlenByRange(d, minh, maxh, cfg);
+            // console.log(JSON.parse(JSON.stringify(cfg)));
+            // if (!cfg_copy) {
+            //     cfg = rowlenByRange(d, minh, maxh, cfg);
+            // }
 
             let allParam = {
                 cfg: cfg,

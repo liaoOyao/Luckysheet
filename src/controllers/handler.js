@@ -5944,6 +5944,7 @@ export default function luckysheetHandler() {
         // 
         // hz 添加的特殊操作：
         // 1.（lh - 20230922）z粘贴时保留换行符
+        // debugger;
         if (isEditMode()) {
             //此模式下禁用粘贴
             return;
@@ -6008,7 +6009,6 @@ export default function luckysheetHandler() {
                     copy_c2 = Store.luckysheet_copy_save["copyRange"][0].column[1];
 
                 let copy_index = Store.luckysheet_copy_save["dataSheetIndex"];
-
                 let d;
                 if (copy_index == Store.currentSheetIndex) {
                     d = editor.deepCopyFlowData(Store.flowdata);
@@ -6049,7 +6049,8 @@ export default function luckysheetHandler() {
                             const cpData = $(cpDataArr[r - copy_r1][c - copy_c1])
                                 .text()
                                 .replace(/\s|\n/g, " ");
-                            const storeValue = v.replace(/\n/g, "").replace(/\s/g, " ");
+                            const storeValue = v.replace(/\r?\n/g, "").replace(/\s/g, " ");
+                            // const storeValue = v.replace(/\n/g, "").replace(/\s/g, " ");
                             if (cpData != storeValue) {
                                 isEqual = false;
                                 break;
@@ -6110,7 +6111,7 @@ export default function luckysheetHandler() {
                     for (let i = 0; i < data.length; i++) {
                         data[i] = new Array(colLen);
                     }
-
+                    // debugger;
                     let r = 0;
                     let borderInfo = {};
                     let rowlen = {};
@@ -6355,9 +6356,9 @@ export default function luckysheetHandler() {
                                         //     return; // 跳过本次操作
                                         // }
                                   
-                                        console.log(($(this).children().length));
-                                        console.log(($(this).children().length) > 1 );
-                                        console.log(this.nodeType == 1);
+                                        // console.log(($(this).children().length));
+                                        // console.log(($(this).children().length) > 1 );
+                                        // console.log(this.nodeType == 1);
                                         // if (this.nodeType == 1 && ($(this).children().length >= 1)  || ($td_c.is("br")) && !($td_c.is("font")) ){
                                         if (this.nodeType == 1 && ($(this).children().length >= 1) && !($td_c.is("font")) ){
 
@@ -6438,18 +6439,31 @@ export default function luckysheetHandler() {
     
                                                 // 检测下划线
                                                 un_td_c = $td_c.css("text-decoration");
-    
                                                 it_td_c = $td_c.css("font-style");
+                                                if(!fontSize_td_c){
+                                                    if($td_c[0] && $td_c[0].style && $td_c[0].style.cssText){
+                                                        if($td_c[0].style.cssText.includes("font-size")){
+                                                            fontSize_td_c = JSON.parse('{"' + $td_c[0].style.cssText.replace(/: /g,'": "').replace(/; /g,'", "') + '"}')['font-size']
+                                                        }
+                                                        
+                                                    }
+                                                   
+                                                }
     
-                                                fontSize_td_c = $td_c.css('font-size');
-    
-                                                if (!fontSize_td_c && fontSize_td != 0) {
+                                                if (!fontSize_td_c && fontSize_td_c != 0) {
+                                                    // debugger;
                                                     fontSize_td_c = 12;
                                                 } else {
+                                                    // debugger;
                                                     if (fontSize_td_c.endsWith("px")) {
                                                         let pxValue = parseInt(fontSize_td_c, 10);
+                                                        
                                                         fontSize_td_c = Math.round(pxValue / 1.333);
+                                                        
                                                     } else {
+                                                        if(fontSize_td_c ==='9pt'){
+                                                            fontSize_td_c = 12;
+                                                        }
                                                         fontSize_td_c = parseInt(fontSize_td_c, 10);
                                                     }
                                                 }
@@ -6509,7 +6523,8 @@ export default function luckysheetHandler() {
                                         }
                                         td_many_s.push(td_c_cell);
                                     });
-                                    cell = get_paste_cell_style($td, cell,styleMap);
+                                    // debugger;
+                                    cell = get_paste_cell_style($td, cell,styleMap,is_luckysheet_table_data_flag);
                                     
                                 }
                                
@@ -6814,13 +6829,18 @@ export default function luckysheetHandler() {
         }
     });
 }
- function get_paste_cell_style($td, cell,styleMap){
+
+ function get_paste_cell_style($td, cell,styleMap, is_luckysheet_table_data_flag=false){
     //hz_flag 
-    //  debugger;  
+    //  debugger; 
     let fontSize = null;
     let fontFamily = null;
     let fontWeight = null;
     const locale_fontjson = locale().fontjson;
+    let is_trust_fs = true; // 标识该字体是否是可值得信任的
+    var $span = $td.find('span');
+    var $p = $td.find('p');
+    let $td_fs_exist = true;
     try {
         let classNames_dom = $td.attr("class");
         let classNames = null;
@@ -6828,13 +6848,28 @@ export default function luckysheetHandler() {
             classNames = classNames_dom.split(/\s+/); //获取到该单元格类名
         }
         try {
+            // debugger;
             if (classNames && styleMap.hasOwnProperty(classNames[0]) && styleMap[classNames[0]].hasOwnProperty('font-size')) {
                 fontSize = styleMap[classNames[0]]['font-size'];
                 fontSize = fontSize ? parseInt(fontSize, 10) : null;
             } else {
-                fontSize = $td.css("font-size");
+                if ($td[0] && $td[0].style && $td[0].style.cssText) {
+                    if ($td[0].style.cssText.includes("font-size")) {
+                      var styleJson = JSON.parse('{"' + $td[0].style.cssText.replace(/: /g,'": "').replace(/; /g,'", "') + '"}');
+                      fontSize = styleJson['font-size'];
+                    }else {
+                        $td_fs_exist = false;
+                    }
+                  }else{
+                    $td_fs_exist = false;
+                  }
+                                            
                 if (!fontSize) {
-                    fontSize = $td.find('span').css('font-size');
+                    
+                    if ($span.length > 0) {
+                        fontSize = $span.css('font-size');
+                    }
+                    
                 }
             }
             if (classNames && styleMap.hasOwnProperty(classNames[0]) && styleMap[classNames[0]].hasOwnProperty('font-weight')) {
@@ -6842,7 +6877,9 @@ export default function luckysheetHandler() {
             } else {
                 fontWeight = $td.css("fontWeight");
                 if (!fontWeight) {
+                    if ($span.length > 0) {
                     fontWeight = $td.find('span').css('fontWeight');
+                    }
                 }
             }
             if (classNames && styleMap.hasOwnProperty(classNames[0]) && styleMap[classNames[0]].hasOwnProperty('font-family')) {
@@ -6850,20 +6887,31 @@ export default function luckysheetHandler() {
             } else {
                 fontFamily = $td.css("font-family");
                 if (!fontFamily) {
-                    fontFamily = $td.find('span').css('font-family');
+                    if ($span.length > 0) {
+                        fontFamily = $td.find('span').css('font-family');
+                    }
                 }
             }
         } catch (error) {
-            fontSize = $td.find('p').css('font-size');
-            fontWeight = $td.find('p').css('fontWeight');
-            fontFamily = $td.find('p').css('font-family');
+            if($p){
+                fontSize = $td.find('p').css('font-size');
+                fontWeight = $td.find('p').css('fontWeight');
+                fontFamily = $td.find('p').css('font-family');
+            }
         }
 
         if (fontSize) {
             if (fontSize.endsWith("px")) {
                 let pxValue = parseInt(fontSize, 10);
-                fontSize = Math.round(pxValue / 1.333);
+                if(is_luckysheet_table_data_flag  && (!is_trust_fs) || (!is_luckysheet_table_data_flag && is_trust_fs)){
+                    fontSize = Math.round(pxValue / 1.333);
+                }else{
+                    fontSize = pxValue;
+                }
             } else {
+                if(fontSize ==='9pt'){
+                    fontSize = 12;
+                }
                 fontSize = parseInt(fontSize, 10);
             }
         }
@@ -6952,7 +7000,10 @@ export default function luckysheetHandler() {
     //   fs = excelFontSize;
     // }
     // debugger;
-    let fs = Math.round((parseInt($td.css("font-size")) * 72) / 96);
+    let fs = 12;
+    if ($td_fs_exist){
+        fs = Math.round((parseInt($td.css("font-size")) * 72) / 96);
+    }
     if (fontSize) {
         fs = fontSize;
     }

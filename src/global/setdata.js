@@ -43,7 +43,6 @@ function setcellvalue(r, c, d, v) {
     } else {
         vupdate = v;
     }
-
     // fix #81， vupdate = ''
     if (vupdate == null) {
         if (getObjType(cell) == "object") {
@@ -96,7 +95,8 @@ function setcellvalue(r, c, d, v) {
             cell.ct = { fa: "General", t: "e" };
         }
         cell.v = vupdate;
-    } else {
+    } 
+    else {
         if (
             cell.f != null &&
             isRealNum(vupdate) &&
@@ -210,7 +210,6 @@ function setcellvalue(r, c, d, v) {
             }
         }
     }
-
     d[r][c] = cell;
     return cell;
 }

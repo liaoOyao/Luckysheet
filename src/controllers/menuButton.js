@@ -4588,8 +4588,47 @@ const menuButton = {
                 console.warn("Main merge Cell info is null", row_index, col_index);
                 return null;
             }
-            let col_rs = d[row_index][col_index].mc.cs;
-            let row_rs = d[row_index][col_index].mc.rs;
+            try {
+                let col_rs = d[row_index][col_index].mc.cs;
+            }catch (e) {
+                // 没有时说明data 里面没有，那么从config 里面获取即可
+                console.log(d[row_index][col_index]);
+                console.log(row_index);
+                console.log(col_index);
+                console.log(e);
+                return null;
+            }
+
+               try {
+               let row_rs = d[row_index][col_index].mc.rs;
+
+            }catch (e) {
+                console.log(row_index);
+                console.log(col_index);
+                console.log(e);
+                return null;
+            }
+
+            let row_data = d[row_index];
+            let row_rs = null;
+            let col_rs = null;
+            if (row_data) {
+              let col_data = row_data[col_index];
+              if (col_data && col_data.mc) {
+                if (col_data.mc.cs) {
+                   col_rs = col_data.mc.cs;
+                }
+                  // 对 col_rs 进行处理
+                if (col_data.mc.rs) {
+                   row_rs = col_data.mc.rs;
+                  // 对 row_rs 进行处理
+                  
+                }
+              }
+            }
+            if(row_rs == null || col_rs == null){
+                return null; // 合并单元格的config 和 对应data 不匹配，因此不处理边框
+            }
 
             let margeMain = d[row_index][col_index].mc;
 
@@ -4633,7 +4672,8 @@ const menuButton = {
                 row: [row_pre, row, row_index, row_index + row_rs - 1],
                 column: [col_pre, col, col_index, col_index + col_rs - 1],
             };
-        } else {
+        } 
+        else {
             return null;
         }
     },
@@ -5359,7 +5399,7 @@ const menuButton = {
             ret.index = this.fontSelectList.length;
             ret.type = "userDefined";
             ret.text =
-                "<span class='luckysheet-mousedown-cancel' style='font-size:11px;font-family:" +
+                "<span class='luckysheet-mousedown-cancel' style='font-size:12px;font-family:" +
                 fontName +
                 "'>" +
                 fontName +
@@ -5382,7 +5422,7 @@ const menuButton = {
             ret.index = a;
             ret.type = "inner";
             ret.text =
-                "<span class='luckysheet-mousedown-cancel' style='font-size:11px;font-family:" +
+                "<span class='luckysheet-mousedown-cancel' style='font-size:12px;font-family:" + //hz_falg字体大小
                 fItem +
                 "'>" +
                 fItem +

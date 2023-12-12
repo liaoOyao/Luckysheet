@@ -456,6 +456,7 @@ function collaborativeEditBox() {
 }
 //复制选区虚线框
 function selectionCopyShow(range) {
+    // debugger;
     $("#luckysheet-selection-copy").empty();
 
     if (range == null) {
