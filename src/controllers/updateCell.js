@@ -290,6 +290,7 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
     formula.createRangeHightlight();
     formula.rangeResizeTo = $("#luckysheet-rich-text-editor");
     cleargridelement();
+    if(!method.createHookFunction('cellEditBeforeEnd',Store.luckysheet_select_save)){return;}
 }
 
 export function setCenterInputPosition(row_index, col_index, d){

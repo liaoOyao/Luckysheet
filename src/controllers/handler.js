@@ -6579,7 +6579,7 @@ export default function luckysheetHandler() {
                                     // debugger;
                                     // 将数组赋值给cell.v.ct 对象
                                     if (!cell.ct) {
-                                        cell.ct = { "fa": "@", "t": "inlineStr", "s": td_only_br_and_content ?td_br_many_s:td_many_s ,"t": 'inlineStr'}
+                                        cell.ct = { "fa": "@", "t": "inlineStr", "s": td_only_br_and_content ?td_br_many_s:td_many_s}
                                     } else {
                                         if (!cell.ct.hasOwnProperty('t') || cell.ct.t !== "inlineStr") {
                                             cell.ct.t = 'inlineStr';

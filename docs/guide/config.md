@@ -604,6 +604,15 @@ The hook functions are uniformly configured under ʻoptions.hook`, and configura
 	- {Array} [range]: Current selection range
 
 ------------
+### cellEditBeforeEnd
+
+- Type: Function
+- Default: null
+- Usage: Triggered before exiting the cell editing mode. After modifying the cell in the editing state, this hook is triggered before exiting the editing mode and updating the data.
+- Parameter: 
+	- {Array} [range]: Current selection range
+
+------------
 ### cellUpdateBefore
 
 - Type: Function
