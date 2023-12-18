@@ -37,7 +37,6 @@ function runExecFunction(range, index, data){
 }
 
 function jfrefreshgrid(data, range, allParam, isRunExecFunction = true, isRefreshCanvas = true) {
-    debugger;
     if(data == null){
         data = Store.flowdata;
     }
