@@ -388,23 +388,34 @@ const sheetmanage = {
 
         return orders;
     },
-    reOrderAllSheet: function() {
+    reOrderAllSheet: function(direction=undefined) {
         let orders = {};
-
+        let change_orders = {};
         $("#luckysheet-sheet-area div.luckysheet-sheets-item").each(function(a) {
             let index = $(this).data("index");
-
             for (let i = 0; i < Store.luckysheetfile.length; i++) {
                 if (Store.luckysheetfile[i].index == index) {
+                    if(a && a.toString() !== Store.luckysheetfile[i].order.toString() ){ // 说明这个index的顺序改变了
+                        change_orders[index.toString()] = a;
+                    }
                     Store.luckysheetfile[i].order = a;
                     orders[index.toString()] = a;
                     break;
                 }
             }
         });
-
+        // hz falg
+        if(!method.createHookFunction('sheet_move',direction,change_orders,orders)){return;}
         server.saveParam("shr", null, orders);
-
+        if (Store.clearjfundo) {
+            Store.jfundo.length = 0;
+            let redo = {};
+            redo["type"] = "shr";  // remove 的意思
+            redo["orders"] = orders; // 现在全部的order 排序
+            redo["change_orders"] = change_orders; // 只记录order 改变的sheet
+            redo["direction"] = direction; // 只记录order 改变的sheet
+            Store.jfredo.push(redo);
+        }
         Store.luckysheetfile.sort((x, y) => {
             let order_x = x.order;
             let order_y = y.order;

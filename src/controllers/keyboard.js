@@ -802,6 +802,7 @@ export function keyboardInitial(){
             }
             else if (kcode == keycode.DELETE || kcode == keycode.BACKSPACE) {
                 if(imageCtrl.currentImgId != null){
+                    debugger;
                     imageCtrl.removeImgItem();
                 }
                 else{
@@ -811,6 +812,7 @@ export function keyboardInitial(){
                 event.preventDefault();
             }
             else if(kcode == 8 && imageCtrl.currentImgId != null){
+                debugger;
                 imageCtrl.removeImgItem();
                 event.preventDefault();
             }

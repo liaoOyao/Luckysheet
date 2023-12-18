@@ -31,7 +31,8 @@ import luckysheetConfigsetting from "./luckysheetConfigsetting";
 export function rowColumnOperationInitial() {
     //表格行标题 mouse事件
     $("#luckysheet-rows-h")
-        .mousedown(function(event) {
+        .off("mousedown").on("mousedown", function(event) {
+        // .mousedown(function(event) {
             if (!checkProtectionAllSelected(Store.currentSheetIndex)) {
                 return;
             }
@@ -403,7 +404,9 @@ export function rowColumnOperationInitial() {
                 countfunc();
             }, 101);
         })
-        .mousemove(function(event) {
+        .off("mousemove").on("mousemove", function(event) {
+            
+        // .mousemove(function(event) {
             if (
                 Store.luckysheet_rows_selected_status ||
                 Store.luckysheet_rows_change_size ||
@@ -429,11 +432,13 @@ export function rowColumnOperationInitial() {
                 $("#luckysheet-rows-change-size").css("opacity", 0);
             }
         })
-        .mouseleave(function(event) {
+        .off("mouseleave").on("mouseleave", function(event) {
+        // .mouseleave(function(event) {
             $("#luckysheet-rows-h-hover").hide();
             $("#luckysheet-rows-change-size").css("opacity", 0);
         })
-        .mouseup(function(event) {
+        .off("mouseup").on("mouseup", function(event) {
+        // .mouseup(function(event) {
             if (event.which == 3) {
                 // *如果禁止前台编辑，则中止下一步操作
                 if (!checkIsAllowEdit()) {
@@ -579,7 +584,8 @@ export function rowColumnOperationInitial() {
 
     //表格列标题 mouse事件
     $("#luckysheet-cols-h-c")
-        .mousedown(function(event) {
+        // .mousedown(function(event) {
+            .off("mousedown").on("mousedown", function(event) {
             if (!checkProtectionAllSelected(Store.currentSheetIndex)) {
                 return;
             }
@@ -938,7 +944,9 @@ export function rowColumnOperationInitial() {
             }
             event.stopPropagation();
         })
-        .mousemove(function(event) {
+
+        // .mousemove(function(event) {
+        .off("mousemove").on("mousemove", function(event) {
             if (Store.luckysheet_cols_selected_status || Store.luckysheet_select_status) {
                 $("#luckysheet-cols-h-hover").hide();
                 $("#luckysheet-cols-menu-btn").hide();
@@ -969,7 +977,8 @@ export function rowColumnOperationInitial() {
                 $("#luckysheet-cols-change-size").css("opacity", 0);
             }
         })
-        .mouseleave(function(event) {
+        .off("mouseleave").on("mouseleave", function(event) {
+        // .mouseleave(function(event) {
             if (Store.luckysheet_cols_menu_status || Store.luckysheet_cols_change_size) {
                 return;
             }
@@ -978,7 +987,8 @@ export function rowColumnOperationInitial() {
             $("#luckysheet-cols-menu-btn").hide();
             $("#luckysheet-cols-change-size").css("opacity", 0);
         })
-        .mouseup(function(event) {
+        .off("mouseup").on("mouseup", function(event) {
+        // .mouseup(function(event) {
             if (event.which == 3) {
                 // *如果禁止前台编辑，则中止下一步操作
                 if (!checkIsAllowEdit()) {
@@ -1122,7 +1132,9 @@ export function rowColumnOperationInitial() {
         });
 
     //表格行标题 改变行高按钮
-    $("#luckysheet-rows-change-size").mousedown(function(event) {
+    $("#luckysheet-rows-change-size").off("mousedown").on("mousedown", function(event) {
+        
+    // $("#luckysheet-rows-change-size").mousedown(function(event) {
         // *如果禁止前台编辑，则中止下一步操作
         if (!checkIsAllowEdit()) {
             return;
@@ -1172,8 +1184,9 @@ export function rowColumnOperationInitial() {
     });
 
     //表格列标题 改变列宽按钮
-    $("#luckysheet-cols-change-size")
-        .mousedown(function(event) {
+    $("#luckysheet-cols-change-size").off("mousedown").on("mousedown", function(event) {
+    // $("#luckysheet-cols-change-size")
+    //     .mousedown(function(event) {
             // *如果禁止前台编辑，则中止下一步操作
             if (!checkIsAllowEdit()) {
                 return;
@@ -1227,12 +1240,14 @@ export function rowColumnOperationInitial() {
             Store.luckysheet_cols_dbclick_times = 0;
             event.stopPropagation();
         })
-        .dblclick(function() {
+        .off("dblclick").on("dblclick", function() {
+        // .dblclick(function() {
             luckysheetcolsdbclick();
         });
 
     // 列标题的下拉箭头
-    $("#luckysheet-cols-menu-btn").click(function(event) {
+    $("#luckysheet-cols-menu-btn").off("click").on("click", function(event) {
+    // $("#luckysheet-cols-menu-btn").click(function(event) {
         // *如果禁止前台编辑，则中止下一步操作
         if (!checkIsAllowEdit()) {
             tooltip.info("", locale().pivotTable.errorNotAllowEdit);
@@ -1314,7 +1329,8 @@ export function rowColumnOperationInitial() {
 
     //向左增加列，向上增加行
     // $("#luckysheet-add-lefttop, #luckysheet-add-lefttop_t").click(function (event) {
-    $("#luckysheet-top-left-add-selected").click(function(event) {
+    $("#luckysheet-top-left-add-selected").off("click").on("click", function(event) {
+    // $("#luckysheet-top-left-add-selected").click(function(event) {
         // Click input element, don't comfirm
         if (event.target.nodeName === "INPUT") {
             return;
@@ -1370,7 +1386,8 @@ export function rowColumnOperationInitial() {
     });
 
     // When you right-click a cell, a row is inserted before the row by default
-    $("#luckysheetColsRowsHandleAdd_row").click(function(event) {
+    $("#luckysheetColsRowsHandleAdd_row").off("click").on("click", function(event) {
+    // $("#luckysheetColsRowsHandleAdd_row").click(function(event) {
         $("#luckysheet-rightclick-menu").hide();
         luckysheetContainerFocus();
 
@@ -1387,7 +1404,8 @@ export function rowColumnOperationInitial() {
 
 
     })
-    $("#luckysheetColsRowsHandleAdd_column").click(function (event) {
+    $("#luckysheetColsRowsHandleAdd_column").off("click").on("click", function(event) {
+    // $("#luckysheetColsRowsHandleAdd_column").click(function (event) {
 
         $("#luckysheet-rightclick-menu").hide();
         luckysheetContainerFocus();
@@ -1401,7 +1419,8 @@ export function rowColumnOperationInitial() {
     });
 
     // custom right-click a cell buttton click
-    $(".luckysheetColsRowsHandleAdd_custom").click(function(clickEvent) {
+    $(".luckysheetColsRowsHandleAdd_custom").off("click").on("click", function(clickEvent) {
+    // $(".luckysheetColsRowsHandleAdd_custom").click(function(clickEvent) {
         $("#luckysheet-rightclick-menu").hide();
         const cellRightClickConfig = luckysheetConfigsetting.cellRightClickConfig;
         const rowIndex = Store.luckysheet_select_save[0].row[0];
@@ -1539,7 +1558,8 @@ export function rowColumnOperationInitial() {
 
     //向右增加列，向下增加行
     // $("#luckysheet-add-rightbottom, #luckysheet-add-rightbottom_t").click(function (event) {
-    $("#luckysheet-bottom-right-add-selected").click(function(event) {
+    $("#luckysheet-bottom-right-add-selected").off("click").on("click", function(event) {    
+    // $("#luckysheet-bottom-right-add-selected").click(function(event) {
         // Click input element, don't comfirm
         if (event.target.nodeName === "INPUT") {
             return;
@@ -1710,7 +1730,8 @@ export function rowColumnOperationInitial() {
     // });
 
     //删除选中行列
-    $("#luckysheet-del-selected, #luckysheet-del-selected_t").click(function(event) {
+    $("#luckysheet-del-selected, #luckysheet-del-selected_t").off("click").on("click", function(event) {
+    // $("#luckysheet-del-selected, #luckysheet-del-selected_t").click(function(event) {
         $("#luckysheet-rightclick-menu").hide();
         luckysheetContainerFocus();
 
@@ -1742,7 +1763,8 @@ export function rowColumnOperationInitial() {
         }
         luckysheetdeletetable(Store.luckysheetRightHeadClickIs, st_index, ed_index);
     });
-    $("#luckysheet-delRows").click(function(event) {
+    $("#luckysheet-delRows").off("click").on("click", function(event) { 
+    // $("#luckysheet-delRows").click(function(event) {
         $("#luckysheet-rightclick-menu").hide();
         luckysheetContainerFocus();
 
@@ -1773,8 +1795,8 @@ export function rowColumnOperationInitial() {
 		}
         luckysheetdeletetable('row', st_index, ed_index);
     })
-    $("#luckysheet-delCols").click(function (event) {
-
+    $("#luckysheet-delCols").off("click").on("click", function (event) {
+    // $("#luckysheet-delCols").click(function (event) {
         $("#luckysheet-rightclick-menu").hide();
         luckysheetContainerFocus();
 
@@ -1803,7 +1825,8 @@ export function rowColumnOperationInitial() {
     });
 
     //隐藏选中行列
-    $("#luckysheet-hide-selected").click(function(event) {
+    $("#luckysheet-hide-selected").off("click").on("click", function(event) {
+    // $("#luckysheet-hide-selected").click(function(event) {
         $("#luckysheet-rightclick-menu").hide();
         luckysheetContainerFocus();
 
@@ -1911,7 +1934,8 @@ export function rowColumnOperationInitial() {
     });
 
     //取消隐藏选中行列
-    $("#luckysheet-show-selected").click(function(event) {
+    $("#luckysheet-show-selected").off("click").on("click", function(event) {
+    // $("#luckysheet-show-selected").click(function(event) {
         $("#luckysheet-rightclick-menu").hide();
         luckysheetContainerFocus();
 
@@ -2189,7 +2213,8 @@ export function rowColumnOperationInitial() {
     // })
 
     //删除单元格（左移、上移）
-    $("#luckysheet-delCellsMoveLeft").click(function(event) {
+
+    $("#luckysheet-delCellsMoveLeft").off("click").on("click", function(event) {
         $("body .luckysheet-cols-menu").hide();
         luckysheetContainerFocus();
         const locale_drag = locale().drag;
@@ -2210,7 +2235,9 @@ export function rowColumnOperationInitial() {
 
         luckysheetDeleteCell("moveLeft", str, edr, stc, edc);
     });
-    $("#luckysheet-delCellsMoveUp").click(function(event) {
+
+    $("#luckysheet-delCellsMoveUp").off("click").on("click", function(event) {
+    // $("#luckysheet-delCellsMoveUp").click(function(event) {
         $("body .luckysheet-cols-menu").hide();
         luckysheetContainerFocus();
 
@@ -2234,8 +2261,16 @@ export function rowColumnOperationInitial() {
     });
 
     //清除单元格内容
-    $("#luckysheet-delete-text").click(function() {
+    // $("#luckysheet-delete-text").click(function() {
+    // $("#luckysheet-delete-text").click(function() {
+    $("#luckysheet-delete-text").off("click").on("click", function() {    
+        let image_active_dom = document.getElementById("luckysheet-modal-dialog-activeImage");
+        const target = event.target || event.srcElement;
+        if (image_active_dom && image_active_dom.contains(target)) {
+          return;
+        }
         if (!checkProtectionLockedRangeList(Store.luckysheet_select_save, Store.currentSheetIndex)) {
+            
             return;
         }
 
@@ -2323,7 +2358,7 @@ export function rowColumnOperationInitial() {
                     }
                 }
             }
-
+            
             jfrefreshgrid(d, Store.luckysheet_select_save, hyperlinkUpdated && { hyperlink });
 
             // 清空编辑框的内容
@@ -2334,7 +2369,8 @@ export function rowColumnOperationInitial() {
 
     //行高列宽设置
     // $("#luckysheet-rows-cols-changesize").click(function(){
-    $("#luckysheet-column-row-width-selected").click(function(event) {
+    $("#luckysheet-column-row-width-selected").off("click").on("click", function(event) {    
+    // $("#luckysheet-column-row-width-selected").click(function(event) {
         // Click input element, don't comfirm
         if (event.target.nodeName === "INPUT") {
             return;

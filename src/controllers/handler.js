@@ -1568,6 +1568,12 @@ export default function luckysheetHandler() {
                 return;
             }
 
+            let image_active_dom = document.getElementById("luckysheet-modal-dialog-activeImage");
+            const target = event.target || event.srcElement;
+            if (image_active_dom && image_active_dom.contains(target)) {  // 双击图片时不进入编辑状态
+              return;
+            }
+
             //禁止前台编辑(只可 框选单元格、滚动查看表格)
             if (!Store.allowEdit) {
                 return;
@@ -3796,6 +3802,7 @@ export default function luckysheetHandler() {
     });
     //表格mouseup
     $(document).on("mouseup.luckysheetEvent", function(event) {
+        debugger;
         if (luckysheetConfigsetting && luckysheetConfigsetting.hook && luckysheetConfigsetting.hook.sheetMouseup) {
             let mouse = mouseposition(event.pageX, event.pageY);
             let x = mouse[0] + $("#luckysheet-cell-main").scrollLeft();
@@ -3988,7 +3995,7 @@ export default function luckysheetHandler() {
             $("#luckysheet-sheets-item-clone").remove();
             Store.luckysheet_sheet_move_data.cursorobject.css({ cursor: "pointer" });
             Store.luckysheet_sheet_move_data = {};
-            sheetmanage.reOrderAllSheet();
+            sheetmanage.reOrderAllSheet('drag_move'); // hz_falg
         }
 
         // chart move debounce timer clear

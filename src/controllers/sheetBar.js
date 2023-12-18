@@ -388,7 +388,7 @@ export function initialSheetBar(){
     $("#luckysheetsheetconfigmoveleft").click(function () {
         if (luckysheetcurrentSheetitem.prevAll(":visible").length > 0) {
             luckysheetcurrentSheetitem.insertBefore(luckysheetcurrentSheetitem.prevAll(":visible").eq(0));
-            sheetmanage.reOrderAllSheet();
+            sheetmanage.reOrderAllSheet('left');
         }
         $("#luckysheet-input-box").removeAttr("style");
         $("#luckysheet-sheet-list, #luckysheet-rightclick-sheet-menu").hide();
@@ -397,7 +397,7 @@ export function initialSheetBar(){
     $("#luckysheetsheetconfigmoveright").click(function () {
         if (luckysheetcurrentSheetitem.nextAll(":visible").length > 0) {
             luckysheetcurrentSheetitem.insertAfter(luckysheetcurrentSheetitem.nextAll(":visible").eq(0));
-            sheetmanage.reOrderAllSheet();
+            sheetmanage.reOrderAllSheet('right');
         }
         $("#luckysheet-input-box").removeAttr("style");
         $("#luckysheet-sheet-list, #luckysheet-rightclick-sheet-menu").hide();

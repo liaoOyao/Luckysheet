@@ -176,7 +176,6 @@ const server = {
 	        d.k = params.k;
 	        // d.s = params.s;
 	    }
-
 		// TODO 配置自定义方式同步图片
 		const customImageUpdateMethodConfig = luckysheetConfigsetting.imageUpdateMethodConfig
 		if (JSON.stringify(customImageUpdateMethodConfig) !== "{}") {
@@ -217,7 +216,6 @@ const server = {
 			}
 
 		}
-
 	},
 	wxErrorCount: 0,
 	wxErrorCounFlag: false, // 标记是否发送过错误提醒
@@ -274,6 +272,7 @@ const server = {
 
 			//客户端接收服务端数据时触发
 			_this.websocket.onmessage = function (result) {
+				debugger;
 				// 如果是自己的操作，就不做处理
 				// debugger;
 				Store.result = result
@@ -433,7 +432,6 @@ const server = {
 
 					// After editing by multiple people, data.data may appear as an empty string
 					let items = data.data === "" ? data.data : JSON.parse(data.data);
-debugger;
 					for (let i = 0; i < items.length; i++) {
 						
 						_this.wsUpdateMsg(items[i]);
@@ -523,7 +521,6 @@ debugger;
 	    }
     },
     wsUpdateMsg: function(item) {
-			debugger;
 	    let type = item.t,
 	        index = item.i,
 	        value = item.v;
@@ -533,12 +530,10 @@ debugger;
 	    if(["v","rv","cg","all","fc","drc","arc","f","fsc","fsr","sh","c"].includes(type) && file == null){
 	        return;
 	    }
-debugger;
 	    if(type == "v"){ //单个单元格数据更新
 	        if(file.data == null || file.data.length == 0){
 	            return;
 	        }
-debugger;
 	        let r = item.r, c = item.c;
 	        file.data[r][c] = value;
 
@@ -560,7 +555,6 @@ debugger;
 	        }
 	    }
 		else if(type == "rv"){ //范围单元格数据更新
-			debugger;
 			if(Object.keys(item.range).length > 0) {
 				Store.cooperativeEdit.merge_range = item.range
 				Store.cooperativeEdit.merge_range.v = item.v
@@ -781,7 +775,6 @@ debugger;
 	        }, 1);
 	    }
 	    else if(type == "drc"){ //删除行列
-				debugger;
 	        if(file.data == null || file.data.length == 0){
 	            return;
 	        }
@@ -817,13 +810,11 @@ debugger;
 	            // for (let r = 0; r < len; r++) {
 	            //     addcol.push(null);
 	            // }
-debugger;
 	            for(let i = 0; i < data.length; i++){
 	                data[i].splice(st_i, len);
 
 	                // data[i] = data[i].concat(addcol);
 	            }
-							debugger;
 	        }
 
 	        for(let x in mc){
@@ -847,7 +838,6 @@ debugger;
 	        }
 	    }
 	    else if(type == "arc"){ //增加行列
-				debugger;
 	        if(file.data == null || file.data.length == 0){
 	            return;
 	        }
@@ -869,7 +859,6 @@ debugger;
 				for(let c = 0; c < data[0].length; c++){
 					row.push(null);
 				}
-debugger;
 	            let arr = [];
 	            for(let i = 0; i < len; i++){
 					if(addData[i] == null){
@@ -881,7 +870,6 @@ debugger;
 				}
 
 				if(direction == "lefttop"){
-					debugger;
 					if(st_i == 0){
 						new Function("data","return " + 'data.unshift(' + arr.join(",") + ')')(data);
 					}
@@ -895,7 +883,6 @@ debugger;
 	        }
 	        else{
 				file["column"] += len;
-debugger;
 	            for(let i = 0; i < data.length; i++){
 					/* 在每一行的指定位置都插入一列 */
 					for (let j = 0; j < len; j++) {
@@ -919,7 +906,6 @@ debugger;
 
 	        if(index == Store.currentSheetIndex){
 				Store.flowdata = data;
-				debugger;
 				editor.webWorkerFlowDataCache(Store.flowdata);//worker存数据
 
 	            Store.config["merge"] = mc;

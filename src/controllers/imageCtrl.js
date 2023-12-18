@@ -705,29 +705,35 @@ const imageCtrl = {
 
         _this.init();
     },
-    moveImgItem: function() {
+    moveImgItem: function () {
+        
         let _this = this;
+        setTimeout(function () {
 
-        _this.move = false;
+            _this.move = false;
 
-        let obj = $("#luckysheet-modal-dialog-activeImage")[0];
-        let item = _this.images[_this.currentImgId];
 
-		var zoomRatio = Store.zoomRatio;
-		
-        if(item.isFixedPos){
-			
-            item.fixedLeft = (obj.offsetLeft - item.crop.offsetLeft) / zoomRatio;
-            item.fixedTop = (obj.offsetTop - item.crop.offsetTop) / zoomRatio;
-        }
-        else{
-            item.default.left = (obj.offsetLeft - item.crop.offsetLeft) / zoomRatio;
-            item.default.top = (obj.offsetTop - item.crop.offsetTop) / zoomRatio;
-        }
+            let obj = $("#luckysheet-modal-dialog-activeImage")[0];
+            let item = _this.images[_this.currentImgId];
 
-        _this.ref();
+            var zoomRatio = Store.zoomRatio;
+
+            if (item.isFixedPos) {
+
+                item.fixedLeft = (obj.offsetLeft - item.crop.offsetLeft) / zoomRatio;
+                item.fixedTop = (obj.offsetTop - item.crop.offsetTop) / zoomRatio;
+            }
+            else {
+                item.default.left = (obj.offsetLeft - item.crop.offsetLeft) / zoomRatio;
+                item.default.top = (obj.offsetTop - item.crop.offsetTop) / zoomRatio;
+            }
+
+            _this.ref();
+        }, 100);
+
     },
     resizeImgItem: function() {
+        
         let _this = this;
 
         _this.resize = null;
@@ -760,6 +766,7 @@ const imageCtrl = {
         _this.ref();
     },
     croppingEnter: function() {
+        
         let _this = this;
         _this.cropping = true;
 
@@ -847,6 +854,7 @@ const imageCtrl = {
         })
     },
     cropChangeImgItem: function() {
+        
         let _this = this;
 
         _this.cropChange = null;
@@ -860,6 +868,7 @@ const imageCtrl = {
         _this.ref();
     },
     restoreImgItem: function() {
+        
         let _this = this;
         let imgItem = _this.images[_this.currentImgId];
 
@@ -899,6 +908,7 @@ const imageCtrl = {
         _this.ref();
     },
     removeImgItem: function() {
+        
         let _this = this;
         let imgItem = _this.images[_this.currentImgId];
 
@@ -915,12 +925,13 @@ const imageCtrl = {
 
         delete _this.images[_this.currentImgId];
         _this.currentImgId = null;
-
+        
         // 钩子 imageDeleteAfter
         method.createHookFunction('imageDeleteAfter', imgItem);
         _this.ref();
     },
     copyImgItem: function(e) {
+        
         let _this = this;
 
         _this.copyImgItemObj = $.extend(true, {}, _this.images[_this.currentImgId]);
@@ -1001,6 +1012,7 @@ const imageCtrl = {
         }
     },
     moveChangeSize: function(rc, index, size) {
+        
         let _this = this;
         let images = $.extend(true, {}, _this.images);
 

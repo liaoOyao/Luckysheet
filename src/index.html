@@ -79,6 +79,7 @@
 		$(function () {
 			
 			function handle_range (range) {
+				console.log(range);
             const that = this;
             try {
                 if (range) {
@@ -706,7 +707,7 @@
 							// console.log(postion);
 						},
 						cellMousedown: function (cell, postion, sheetFile, ctx) {
-							console.log(sheetFile,"cellMousedown");
+							// console.log(sheetFile,"cellMousedown");
 						},
 						sheetMousemove: function (cell, postion, sheetFile, moveState, ctx) {
 							// console.log(cell,postion,sheetFile,moveState,ctx);
@@ -725,6 +726,9 @@
 						},
 						sheetActivate: function (index, isPivotInitial, isNewSheet) {
 							// console.info(index, isPivotInitial, isNewSheet)
+						},
+						sheet_move:function(direction, change_orders,orders){
+							console.info(direction,change_orders,orders);
 						},
 						rangeSelect: function (index, sheet) {
 							// console.info(index, sheet)
