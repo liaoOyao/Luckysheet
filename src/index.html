@@ -752,10 +752,11 @@
 							// console.info(r, c, oldCell, newCell)
 						},
 						cellEditBefore: function (range) {
-							console.info(range, "cellEditBefore",document.getElementById("luckysheet-input-box").getBoundingClientRect())
+							// console.info(range, "cellEditBefore",document.getElementById("luckysheet-input-box").getBoundingClientRect())
 						},
-						cellEditBeforeEnd: function (range) {
-							console.info(range, "cellEditBeforeEnd",document.getElementById("luckysheet-input-box").getBoundingClientRect())
+						cellEditBeforeEnd: function (range,sheet_index,cell) {
+							console.info(range, "cellEditBeforeEnd",sheet_index,cell);
+							// console.info(range, "cellEditBeforeEnd",document.getElementById("luckysheet-input-box").getBoundingClientRect())
 						},
 						workbookCreateAfter: function (json) {
 							// console.info(json)
@@ -2516,9 +2517,11 @@
 				var infoDiv = document.getElementById("infoDiv");
 				infoDiv.innerHTML = "";
 			}
+			
 			// 绑定按钮点击事件
 			// document.getElementById("myButton").addEventListener("click", get_data);
 			document.getElementById("copy_data_btn").addEventListener("click", get_and_copy_data);
+			
 		})
 	</script>
 	<style>

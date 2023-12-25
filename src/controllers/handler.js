@@ -3802,7 +3802,6 @@ export default function luckysheetHandler() {
     });
     //表格mouseup
     $(document).on("mouseup.luckysheetEvent", function(event) {
-        debugger;
         if (luckysheetConfigsetting && luckysheetConfigsetting.hook && luckysheetConfigsetting.hook.sheetMouseup) {
             let mouse = mouseposition(event.pageX, event.pageY);
             let x = mouse[0] + $("#luckysheet-cell-main").scrollLeft();

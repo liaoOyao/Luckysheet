@@ -99,7 +99,6 @@ function jfrefreshgrid(data, range, allParam, isRunExecFunction = true, isRefres
         else{
             curDynamicArray = dynamicArray;
         }
-        debugger;
         Store.jfredo.push({ 
             "back":Store.back,
             "type": "datachange", 
