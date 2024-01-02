@@ -1456,6 +1456,8 @@ const sheetmanage = {
         _this.restoreselect();
         //工作表保护的事件 不初始化工作表保护打开以后引用单元格点不动
         initialEvent(file);
+          // 钩子函数
+        method.createHookFunction("sheetActivateAfter", index, isPivotInitial, isNewSheet);The order parameter is invalid.
     },
 
     refreshAllPivotTable: function(index) {
