@@ -5482,6 +5482,7 @@ export function setSheetOrder(orderList, options = {}) {
  * @param {Number} zoom 工作表缩放比例，值范围为0.1 ~ 4；
  * @param {Object} options 可选参数
  * @param {Number} options.order 工作表下标；默认值为当前工作表下标
+ * @param {Number} options.index 工作表下标；默认值为当前工作表下标
  * @param {Function} options.success 操作结束的回调函数
  */
 export function setSheetZoom(zoom, options = {}) {
@@ -5522,7 +5523,51 @@ export function setSheetZoom(zoom, options = {}) {
     }
 }
 
+/**
+ * 通过index 设置工作表缩放比例
+ * @param {Number} zoom 工作表缩放比例，值范围为0.1 ~ 4；
+ * @param {Object} options 可选参数
+ * @param {Number} options.index 工作表index；默认值为当前工作表index
+ * @param {Function} options.success 操作结束的回调函数
+ */
+export function setSheetZoomByIndex(zoom, options = {}) {
+    if(!isRealNum(zoom) || zoom < 0.1 || zoom > 4){
+        return tooltip.info("The zoom parameter is invalid.", "");
+    }
 
+    let {
+        index = Store.currentSheetIndex,
+        success
+    } = {...options}
+    let file = sheetmanage.getSheetByIndex(index);
+    // let file = Store.luckysheetfile[order];
+
+    if(file == null){
+        
+        return tooltip.info("The index parameter is invalid.", "");
+    }
+
+    file["zoomRatio"] = zoom;
+
+    server.saveParam("all", file.index, zoom, { "k": "zoomRatio" });
+
+    if(file.index == Store.currentSheetIndex){
+        Store.zoomRatio = zoom;
+        // 图片
+        
+        
+        imageCtrl.images = file.images;
+        imageCtrl.allImagesShow();
+        imageCtrl.init();
+
+        zoomNumberDomBind();
+        zoomRefreshView();
+    }
+
+    if (success && typeof success === 'function') {
+        success();
+    }
+}
 /**
  * 显示指定下标工作表的网格线，返回操作的工作表对象
  * @param {Object} options 可选参数
@@ -6952,4 +6997,19 @@ export function openSearchDialog(source = 1){
     luckysheetSearchReplace.createDialog(source);
     luckysheetSearchReplace.init();
     $("#luckysheet-search-replace #searchInput input").focus();
+}
+
+export function enter_cell(luckysheet_select_save, data = undefined) {
+    if (!data) {
+        data = Store.flowdata;
+    }
+    Store.luckysheet_select_save = luckysheet_select_save;
+    const row_focus = luckysheet_select_save[0]["row_focus"];
+    const column_focus = luckysheet_select_save[0]["row_focus"];
+    luckysheetupdateCell(row_focus, column_focus, Store.flowdata, false, false);
+    //  现在选中的dom 还是 之前的
+
+    /* 设置选区高亮 */
+    selectHightlightShow();
+
 }

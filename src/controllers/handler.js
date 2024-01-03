@@ -280,7 +280,7 @@ export default function luckysheetHandler() {
 
     //表格mousedown
     $("#luckysheet-cell-main, #luckysheetTableContent")
-        .mousedown(function(event) { // hz-flag  鼠标按下时拖拽
+        .mousedown(function(event) { // hz-flag  鼠标按下时拖拽、单元格点击
             // debugger;
             if ($(event.target).hasClass("luckysheet-mousedown-cancel")) {
                 return;
