@@ -1,6 +1,6 @@
 {
   "name": "luckysheet",
-  "version": "2.1.13",
+  "version": "2.2.0",
   "main": "dist/luckysheet.cjs.js",
   "module": "dist/luckysheet.esm.js",
   "browser": "dist/luckysheet.umd.js",
@@ -50,7 +50,8 @@
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs",
     "commit": "git-cz",
-    "release": "standard-version"
+    "release": "standard-version",
+    "publish": "npm publish"
   },
   "files": [
     "dist"
