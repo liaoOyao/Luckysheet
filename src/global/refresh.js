@@ -470,7 +470,7 @@ function jfrefreshgrid_adRC(data, cfg, ctrlType, ctrlValue, calc, filterObj, cf,
             "hyperlink": $.extend(true, {}, file.hyperlink),
             "curHyperlink": hyperlink,
             "range": file.luckysheet_select_save,
-            "dataRange": [...file.luckysheet_select_save]// 保留操作时的选区
+            "dataRange": [...file.luckysheet_select_save],// 保留操作时的选区
         });
     }
 

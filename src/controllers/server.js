@@ -272,7 +272,6 @@ const server = {
 
 			//客户端接收服务端数据时触发
 			_this.websocket.onmessage = function (result) {
-				debugger;
 				// 如果是自己的操作，就不做处理
 				// debugger;
 				Store.result = result
@@ -456,7 +455,7 @@ const server = {
 			//通信发生错误时触发
 			_this.websocket.onerror = function () {
 				_this.wxErrorCount++;
-				if ((_this.wxErrorCount > 3) && !(_this.wxErrorCounMoreFlag) && !(_this.wxCloseCounFlag)) {
+				if ((_this.wxErrorCount > 5) && !(_this.wxErrorCounMoreFlag) && !(_this.wxCloseCounFlag)) {
 					// 在适当的时机调用sendMessage发送消息
 					_this.wxErrorCounMoreFlag = true;
 					_this.wxCloseCounFlag = true;
@@ -489,7 +488,7 @@ const server = {
 					// alert(locale().websocket.contact);
 					// 异常的关闭
 					_this.wxCloseCount++;
-					if(_this.wxCloseCount > 3 && !_this.wxCloseCounMoreFlag){
+					if(_this.wxCloseCount > 5 && !_this.wxCloseCounMoreFlag){
 						_this.wxCloseCounMoreFlag = true;
 						const message = {  // 多次产生多次关闭的消息 ，但是只发一次
 							"type": -2,
@@ -497,7 +496,7 @@ const server = {
 						}
 						// 在适当的时机调用sendMessage发送消息
 						sendMessage(message);
-					}else if(!_this.wxCloseCounFlag) { // 不少于3次关闭消息，但是只发送一次关闭消息
+					}else if(_this.wxCloseCount > 5 && !_this.wxCloseCounFlag) { // 不少于3次关闭消息，但是只发送一次关闭消息
 						_this.wxCloseCounFlag = true;
 						const message = {
 							"type": -1,
@@ -851,7 +850,7 @@ const server = {
 	        	borderInfo = value.borderInfo;
 	        let data = $.extend(true, [], file.data);
 
-	        if(rc == "r"){
+	        if(rc == "r"){ // hz_falg 新增行
 				file["row"] += len;
 
 				//空行模板
@@ -881,12 +880,12 @@ const server = {
 					new Function("data","return " + 'data.splice(' + (st_i + 1) + ', 0, ' + arr.join(",") + ')')(data);
 				}
 	        }
-	        else{
+	        else{  // 新增列 
 				file["column"] += len;
 	            for(let i = 0; i < data.length; i++){
 					/* 在每一行的指定位置都插入一列 */
 					for (let j = 0; j < len; j++) {
-						if(direction == "lefttop"){
+						if(direction == "lefttop"){  // 左边新增一列
 							data[i].splice(st_i, 0, addData[j]);
 						}else{
 							data[i].splice(st_i + 1, 0, addData[j]);

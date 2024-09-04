@@ -79,6 +79,7 @@
 		$(function () {
 			
 			function handle_range (range) {
+				debugger;
 				console.log(range);
             const that = this;
             try {
@@ -2504,6 +2505,7 @@
 				"pivotTable": null,//系统自动产生
 				"isPivotTable": false//系统自动产生
 			};
+			options.defaultRowHeight = 30;
 			// window.luckysheet.sheetmanage.setCustomSheet(customSheetconfig);//设置自定义sheet
 			luckysheet.create(options);
 			function get_data() {

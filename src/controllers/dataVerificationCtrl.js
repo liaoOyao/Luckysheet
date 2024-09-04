@@ -1057,13 +1057,13 @@ const dataVerificationCtrl = {
             return;
         }
 
-        //单元格数据验证 类型是 下拉列表
+        //单元格数据验证 类型是 下拉列表  hz 
         if(item.type == 'dropdown'){
             $("#luckysheet-dataVerification-dropdown-btn").show().css({
                 'max-width': col - col_pre,
                 'max-height': row - row_pre,
-                'left': col - 20,
-                'top': row_pre + (row - row_pre - 20) / 2
+                'left': col - 22,  // 数字是#luckysheet-dataVerification-dropdown-btn  按钮的宽高
+                'top': row_pre + (row - row_pre - 22) / 2
             })
 
             if($("#luckysheet-dataVerification-dropdown-List").is(":visible")){
