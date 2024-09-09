@@ -536,7 +536,6 @@ function jfrefreshgrid_adRC(data, cfg, ctrlType, ctrlValue, calc, filterObj, cf,
 
     //Store.flowdata
     Store.flowdata = data;
-    debugger;
     editor.webWorkerFlowDataCache(Store.flowdata);//worker存数据
     file.data = data;
     console.log(Store, file);
@@ -632,7 +631,6 @@ function common_handel_row_col_all_deleted(Store, file){
     /**
      *  1、如果是被删除空了的话，创建一个空白行
      */
-    debugger;
     const _locale = locale();
     const locale_sheetconfig = _locale.sheetconfig;
     const flowdata_len = Store.flowdata? Store.flowdata.length:0;
