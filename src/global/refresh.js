@@ -20,6 +20,7 @@ import { createFilterOptions } from '../controllers/filter';
 import { getSheetIndex } from '../methods/get';
 import Store from '../store';
 import tooltip from "./tooltip";
+
 import locale from '../locale/locale';
 
 let refreshCanvasTimeOut = null;
@@ -473,6 +474,7 @@ function jfrefreshgrid_adRC(data, cfg, ctrlType, ctrlValue, calc, filterObj, cf,
             "curHyperlink": hyperlink,
             "range": file.luckysheet_select_save,
             "dataRange": [...file.luckysheet_select_save],// 保留操作时的选区
+            "defaultcolumnNum":Store.defaultcolumnNum,
         });
     }
 
@@ -637,10 +639,13 @@ function common_handel_row_col_all_deleted(Store, file){
     // 1、
     if(flowdata_len == 0){
         // 提示一下，至少存在一个空白，已自动创建
-        Store.flowdata = [null*Store.defaultcolumnNum ];
-        file.data = [null*Store.defaultcolumnNum ];
+        Store.flowdata = [Array(Store.defaultcolumnNum).fill(null)];
+        file.data = [Array(Store.defaultcolumnNum).fill(null)];
+        Store.luckysheetfile[getSheetIndex(Store.currentSheetIndex)].data = Store.flowdata;
+        editor.webWorkerFlowDataCache(Store.flowdata);//worker存数据
+        tooltip.info(locale().sheetconfig.autoOneRowCol, "");
+
     }
-    tooltip.info(locale().sheetconfig.autoOneRowCol, "");
 }
 //删除单元格 刷新表格
 function jfrefreshgrid_deleteCell(data, cfg, ctrl, calc, filterObj, cf, dataVerification, hyperlink){

@@ -1300,6 +1300,7 @@ const luckysheetformula = {
             });
     },
     updatecell: function(r, c, value, isRefresh = true) {
+        debugger;
         // hz_tag
         // 备注说明：
         //     - 执行修改操作的函数。经检查，添加换行后，该函数内会在单元格的ct.s 中设置默认的字体格式！
@@ -1430,7 +1431,7 @@ const luckysheetformula = {
         window.luckysheet_getcelldata_cache = null;
 
         let isRunExecFunction = true;
-
+        debugger;
         let d = editor.deepCopyFlowData(Store.flowdata);
         let dynamicArrayItem = null; //动态数组
 
@@ -1622,9 +1623,11 @@ const luckysheetformula = {
                 isRunExecFunction = false;
             }
         }
-
+    debugger;
         // value maybe an object
+        console.log(editor.deepCopyFlowData(Store.flowdata),"刷新的")
         setcellvalue(r, c, d, value);
+        console.log(d);
         _this.cancelNormalSelected();
 
         let RowlChange = false;
@@ -1723,7 +1726,7 @@ const luckysheetformula = {
             method.createHookFunction("cellUpdated", r, c, JSON.parse(oldValue), Store.flowdata[r][c], isRefresh);
         }, 0);
 
-        if (isRefresh) {
+        if (isRefresh) {  // 需要刷新
             jfrefreshgrid(d, [{ row: [r, r], column: [c, c] }], allParam, isRunExecFunction);
             // Store.luckysheetCellUpdate.length = 0; //clear array
             _this.execFunctionGlobalData = null; //销毁

@@ -7,6 +7,7 @@ import Store from "../store/index";
 
 //Set cell value
 function setcellvalue(r, c, d, v) {
+    debugger;
     if (d == null) {
         d = Store.flowdata;
     }

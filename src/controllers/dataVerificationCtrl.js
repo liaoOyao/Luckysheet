@@ -1601,6 +1601,7 @@ const dataVerificationCtrl = {
         }
 
         let d = editor.deepCopyFlowData(Store.flowdata);
+        debugger;
         setcellvalue(r, c, d, value);
 
         _this.refOfCheckbox(
