@@ -6491,6 +6491,7 @@ export default {
 
         tipNameRepeat:"¡El nombre de la página de la pestaña no se puede repetir! Revísalo",
         noMoreSheet:"El libro de trabajo contiene al menos una hoja de trabajo visual. Para eliminar la hoja de trabajo seleccionada, inserta una nueva hoja de trabajo o muestra una hoja de trabajo oculta",
+        autoOneRowCol: "Crear automáticamente una fila en blanco (debe existir al menos una fila en blanco)",
         confirmDelete:"¿Estás seguro de eliminar",
         redoDelete:"Se puede deshacer con Ctrl+Z",
         noHide:"No se puede ocultar, al menos conserva una etiqueta de hoja",

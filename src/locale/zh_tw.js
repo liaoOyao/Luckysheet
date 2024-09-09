@@ -6502,6 +6502,7 @@ export default {
         tipNameRepeat              : "籤頁的名稱不能重複！請重新修改",
         noMoreSheet                : "工作薄內至少含有一張可視工作表。若需删除選定的工作表,請先插入一張新工作表或顯示一張隱藏的工作表。。",
         confirmDelete              : "是否删除",
+        autoOneRowCol               : "已自动创建一条空白行（至少有一行）",
         redoDelete                 : "可以通過Ctrl+Z撤銷删除",
         noHide                     : "不能隱藏,至少保留一個sheet標籤",
         chartEditNoOpt             : "圖表編輯模式下不允許該操作！",

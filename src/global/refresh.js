@@ -19,6 +19,8 @@ import { selectHightlightShow, selectionCopyShow, collaborativeEditBox } from '.
 import { createFilterOptions } from '../controllers/filter';
 import { getSheetIndex } from '../methods/get';
 import Store from '../store';
+import tooltip from "./tooltip";
+import locale from '../locale/locale';
 
 let refreshCanvasTimeOut = null;
 
@@ -532,9 +534,10 @@ function jfrefreshgrid_adRC(data, cfg, ctrlType, ctrlValue, calc, filterObj, cf,
 
     //Store.flowdata
     Store.flowdata = data;
+    debugger;
     editor.webWorkerFlowDataCache(Store.flowdata);//worker存数据
     file.data = data;
-
+    console.log(Store, file);
     //config
     Store.config = cfg;
     file.config = Store.config;
@@ -618,11 +621,27 @@ function jfrefreshgrid_adRC(data, cfg, ctrlType, ctrlValue, calc, filterObj, cf,
     hyperlinkCtrl.hyperlink = hyperlink;
     file.hyperlink = hyperlink;
     server.saveParam("all", Store.currentSheetIndex, file.hyperlink, { "k": "hyperlink" });
-
-    //行高、列宽刷新
+    console.log(Store, file);
+    //行高、列宽刷新  hz_flag
+    common_handel_row_col_all_deleted(Store,file);
     jfrefreshgrid_rhcw(Store.flowdata.length, Store.flowdata[0].length);
 }
-
+function common_handel_row_col_all_deleted(Store, file){
+    /**
+     *  1、如果是被删除空了的话，创建一个空白行
+     */
+    debugger;
+    const _locale = locale();
+    const locale_sheetconfig = _locale.sheetconfig;
+    const flowdata_len = Store.flowdata? Store.flowdata.length:0;
+    // 1、
+    if(flowdata_len == 0){
+        // 提示一下，至少存在一个空白，已自动创建
+        Store.flowdata = [null*Store.defaultcolumnNum ];
+        file.data = [null*Store.defaultcolumnNum ];
+    }
+    tooltip.info(locale().sheetconfig.autoOneRowCol, "");
+}
 //删除单元格 刷新表格
 function jfrefreshgrid_deleteCell(data, cfg, ctrl, calc, filterObj, cf, dataVerification, hyperlink){
     let file = Store.luckysheetfile[getSheetIndex(Store.currentSheetIndex)];

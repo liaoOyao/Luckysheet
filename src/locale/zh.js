@@ -6801,6 +6801,7 @@ export default {
         noMoreSheet:
             "工作薄内至少含有一张可视工作表。若需删除选定的工作表，请先插入一张新工作表或显示一张隐藏的工作表。",
         confirmDelete: "是否删除",
+        autoOneRowCol: "自动创建一条空白行（至少存在一个空白行）",
         redoDelete: "可以通过Ctrl+Z撤销删除",
         noHide: "不能隐藏, 至少保留一个sheet标签",
         chartEditNoOpt: "图表编辑模式下不允许该操作！",

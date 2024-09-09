@@ -6806,6 +6806,7 @@ export default {
         noMoreSheet:
             "The workbook contains at least one visual worksheet. To delete the selected worksheet, please insert a new worksheet or show a hidden worksheet.",
         confirmDelete: "Are you sure to delete",
+        autoOneRowCol: "Automatically create a blank row (at least one blank row must exist)",
         redoDelete: "Can be undo by Ctrl+Z",
         noHide: "Can't hide, at least keep one sheet tag",
         chartEditNoOpt: "This operation is not allowed in chart editing mode!",
