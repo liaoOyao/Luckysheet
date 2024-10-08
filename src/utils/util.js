@@ -6,7 +6,7 @@ import Store from "../store";
 import locale from "../locale/locale";
 import numeral from "numeral";
 import luckysheetConfigsetting from "../controllers/luckysheetConfigsetting";
-import setInputBoxHorizontalAlignment from "../controllers/customSettingHandle";
+import {setInputBoxHorizontalAlignment} from "../controllers/customSettingHandle";
 // import method from '../global/method';
 
 /**

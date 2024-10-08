@@ -32,6 +32,7 @@ import { countfunc } from "../global/count";
 import { hideMenuByCancel } from "../global/cursorPos";
 import { getSheetIndex, getRangetxt, getluckysheetfile } from "../methods/get";
 import { setluckysheetfile } from "../methods/set";
+import {setInputBoxHorizontalAlignment, setInputBoxVerticalAlignment} from "../controllers/customSettingHandle"
 import {
     isInlineStringCell,
     isInlineStringCT,
@@ -1844,7 +1845,7 @@ const menuButton = {
 
                 $("body").append(menu);
                 $menuButton = $("#" + menuButtonId).width(140);
-                _this.focus($menuButton);
+                _this.focus($menuButton,  setInputBoxHorizontalAlignment(luckysheetConfigsetting));  //hz_flag  默认水平方向对齐方式
 
                 $menuButton.find(".luckysheet-cols-menuitem").click(function() {
                     $menuButton.hide();
@@ -1929,7 +1930,7 @@ const menuButton = {
 
                 $("body").append(menu);
                 $menuButton = $("#" + menuButtonId).width(140);
-                _this.focus($menuButton, "bottom");
+                _this.focus($menuButton, setInputBoxVerticalAlignment(luckysheetConfigsetting));  // hz_falg 从bottom 改完默认配置
 
                 $menuButton.find(".luckysheet-cols-menuitem").click(function() {
                     $menuButton.hide();
@@ -4283,7 +4284,7 @@ const menuButton = {
         } else if (attr == "ht") {
             let $menuButton = $("#luckysheet-icon-align-menu-menuButton");
             let $t = $("luckysheet-icon-align"),
-                itemvalue = "left";
+                itemvalue = setInputBoxHorizontalAlignment(luckysheetConfigsetting);
 
             if (foucsStatus == "0") {
                 itemvalue = "center";
@@ -4295,7 +4296,6 @@ const menuButton = {
 
             // add iconfont
             const iconfontObject = iconfontObjects.align;
-
             let $icon = $("#luckysheet-icon-align")
                 .attr("type", itemvalue)
                 .find(".luckysheet-icon-img-container");
