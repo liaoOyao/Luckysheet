@@ -1193,12 +1193,13 @@ let nullCellRender = function(r, c, start_r, start_c, end_r, end_c,luckysheetTab
         luckysheetTableContent.font = fontset;
 
         //水平对齐 (默认为1，左对齐)
-        let horizonAlignPos = (start_c + 4 + offsetLeft) ;
-
+        let horizonAlignPos = (start_c + 4 + offsetLeft)/2 ;  //hz_flag 无效
+        debugger;
         //垂直对齐 (默认为2，下对齐)
         let verticalFixed = browser.luckysheetrefreshfixed();
-        let verticalAlignPos = (end_r + offsetTop - 2) ; 
-        luckysheetTableContent.textBaseline = 'bottom';
+        let verticalAlignPos = (end_r + offsetTop - 2)/2 ; //hz_flag
+        debugger;
+        luckysheetTableContent.textBaseline = 'middle';// hz_flag 将基线从bottom 改为 middle
         
         luckysheetTableContent.fillText(value == null ? "" : value, horizonAlignPos, verticalAlignPos);
     }

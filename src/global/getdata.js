@@ -471,17 +471,17 @@ export function checkstatusByCell(cell, a){
     }
     else if(a == "ht"){
         if(foucsStatus == null){
-            foucsStatus = "1";
+            foucsStatus = "0"; // hz_flag 1 改为0
         }
         else{
             foucsStatus = foucsStatus[a];
             if(foucsStatus == null){
-                foucsStatus = "1";
+                foucsStatus = "0";  // hz_flag 1 改为0
             }
         }
 
         if(["0", "1", "2"].indexOf(foucsStatus.toString()) == -1){
-            foucsStatus = "1";
+            foucsStatus = "0"; // hz_flag 1 改为0
         }
     }
     else if(a == "vt"){//默认垂直居中

@@ -1202,6 +1202,7 @@ const sheetmanage = {
     },
     mergeCalculationSheet: {},
     mergeCalculation: function(index) {
+        console.log("index_my", this.getSheetIndex(index));
         let file = Store.luckysheetfile[this.getSheetIndex(index)];
         let config = file.config,
             data = file.data;
@@ -1214,36 +1215,42 @@ const sheetmanage = {
         }
 
         this.mergeCalculationSheet[index] = 1;
-
+        console.log(mergeConfig);
+        console.log(data);
         for (let x in mergeConfig) {
             let r = parseInt(x.substr(0, x.indexOf("_")));
             let c = parseInt(x.substr(x.indexOf("_") + 1));
             let mcInfo = mergeConfig[x];
-            if (data[r][c] == null) {
-                data[r][c] = {};
-            }
-
-            data[r][c]["mc"] = {
-                r: r,
-                c: c,
-                rs: mcInfo.rs,
-                cs: mcInfo.cs,
-            };
-
-            for (let ir = r; ir < r + mcInfo.rs; ir++) {
-                for (let ic = c; ic < c + mcInfo.cs; ic++) {
-                    if (ir == r && ic == c) {
-                        continue;
+            console.log(r, c);
+            debugger;
+            if (data){
+                if (data[r][c] == null) {
+                    data[r][c] = {};
+                }
+    
+                data[r][c]["mc"] = {
+                    r: r,
+                    c: c,
+                    rs: mcInfo.rs,
+                    cs: mcInfo.cs,
+                };
+    
+                for (let ir = r; ir < r + mcInfo.rs; ir++) {
+                    for (let ic = c; ic < c + mcInfo.cs; ic++) {
+                        if (ir == r && ic == c) {
+                            continue;
+                        }
+                        if (data[ir][ic] == null) {
+                            data[ir][ic] = {};
+                        }
+                        data[ir][ic]["mc"] = {
+                            r: r,
+                            c: c,
+                        };
                     }
-                    if (data[ir][ic] == null) {
-                        data[ir][ic] = {};
-                    }
-                    data[ir][ic]["mc"] = {
-                        r: r,
-                        c: c,
-                    };
                 }
             }
+ 
         }
     },
     loadOtherFile: function(file) {
