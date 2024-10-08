@@ -5244,7 +5244,7 @@ const menuButton = {
     getStyleByCell: function(d, r, c) {  // hz-flag 复制时获取单元格的属性、粘贴时获取数据的
         let _this = this;
         let style = "";
-// debugger;
+        // debugger;
         //交替颜色
         let af_compute = alternateformat.getComputeMap();
         let checksAF = alternateformat.checksAF(r, c, af_compute);
@@ -5319,7 +5319,7 @@ const menuButton = {
                     style += "color: " + value + ";";
                 }
             }
-// debugger;
+            // debugger;
             if (key == "ht" && value != "1") {
                 if (value == "0") {
                     style += "text-align: center;";

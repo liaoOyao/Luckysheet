@@ -40,6 +40,8 @@ const luckysheetConfigsetting = {
     defaultTextColor: '#000',
     defaultCellColor: '#fff',
     show_select_count: true,
+    defaultHT:"0", // 水平对齐 0 居中、1 左、2右
+    defaultVT:"0",  // 垂直对齐  0 中间、1 上、2下
 }
 
 export default luckysheetConfigsetting;

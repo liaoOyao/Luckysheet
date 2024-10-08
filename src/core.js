@@ -139,6 +139,8 @@ luckysheet.create = function(setting) {
 
     luckysheetConfigsetting.imageUpdateMethodConfig = extendsetting.imageUpdateMethodConfig;
     luckysheetConfigsetting.show_select_count = extendsetting.show_select_count;
+    luckysheetConfigsetting.defaultHT=extendsetting.defaultHT; // 水平对齐 0 居中、1 左、2右
+    luckysheetConfigsetting.defaultVT=extendsetting.defaultVT;  // 垂直对齐  0 中间、1 上、2下
 
     if (Store.lang === "zh") flatpickr.localize(Mandarin.zh);
 

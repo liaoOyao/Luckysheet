@@ -8,6 +8,7 @@ import sheetmanage from '../controllers/sheetmanage';
 import { isInlineStringCT,isInlineStringCell,convertCssToStyleList } from '../controllers/inlineString';
 import locale from '../locale/locale';
 import Store from '../store';
+import luckysheetConfigsetting from "../controllers/luckysheetConfigsetting";
 
 //Get selection range value
 export function getdatabyselection(range, sheetIndex) {
@@ -471,12 +472,12 @@ export function checkstatusByCell(cell, a){
     }
     else if(a == "ht"){
         if(foucsStatus == null){
-            foucsStatus = "0"; // hz_flag 1 改为0
+            foucsStatus = luckysheetConfigsetting.defaultHT; // hz_flag 1 改为0
         }
         else{
             foucsStatus = foucsStatus[a];
             if(foucsStatus == null){
-                foucsStatus = "0";  // hz_flag 1 改为0
+                foucsStatus = luckysheetConfigsetting.defaultHT;  // hz_flag 1 改为0
             }
         }
 
@@ -486,12 +487,12 @@ export function checkstatusByCell(cell, a){
     }
     else if(a == "vt"){//默认垂直居中
         if(foucsStatus == null){
-            foucsStatus = "0";
+            foucsStatus = luckysheetConfigsetting.defaultVT;  // hz_flag 1 改为0
         }
         else{
             foucsStatus = foucsStatus[a];
             if(foucsStatus == null){
-                foucsStatus = "0";
+                foucsStatus = luckysheetConfigsetting.defaultVT;  // hz_flag 1 改为0
             }
         }
 

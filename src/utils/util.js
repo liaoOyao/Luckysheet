@@ -5,6 +5,8 @@ import { hasChinaword, isRealNum } from "../global/validate";
 import Store from "../store";
 import locale from "../locale/locale";
 import numeral from "numeral";
+import luckysheetConfigsetting from "../controllers/luckysheetConfigsetting";
+import setInputBoxHorizontalAlignment from "../controllers/customSettingHandle";
 // import method from '../global/method';
 
 /**
@@ -488,7 +490,8 @@ function luckysheetactiveCell() {
             // need preventScroll:true,fix Luckysheet has been set top, and clicking the cell will trigger the scrolling problem
             const input = document.getElementById("luckysheet-rich-text-editor");
             input.focus({ preventScroll: true });
-            $("#luckysheet-rich-text-editor").select();
+            const v = setInputBoxHorizontalAlignment(luckysheetConfigsetting);
+            input.style.setProperty('text-align',v , 'important'); // 默认居中
             // $("#luckysheet-rich-text-editor").focus().select();
         }, 50);
     }
@@ -502,7 +505,6 @@ function luckysheetContainerFocus() {
 
     // fix jquery error: Uncaught TypeError: ((n.event.special[g.origType] || {}).handle || g.handler).apply is not a function
     // $("#" + Store.container).attr("tabindex", 0).focus();
-
     // need preventScroll:true,fix Luckysheet has been set top, and clicking the cell will trigger the scrolling problem fix #794 #152
     document.getElementById(Store.container).focus({ preventScroll: true });
 }
