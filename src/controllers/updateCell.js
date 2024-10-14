@@ -17,6 +17,8 @@ import {isInlineStringCell} from './inlineString';
 import Store from '../store';
 import server from './server';
 import method from '../global/method';
+import luckysheetConfigsetting from "./luckysheetConfigsetting";
+import {setInputBoxHorizontalAlignment, setInputBoxVerticalAlignment} from "../controllers/customSettingHandle";
 
 export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocus) {
     // hz_tag 
@@ -125,7 +127,10 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
     if (!isnotfocus) {
         $("#luckysheet-rich-text-editor").focus().select();
     }
-
+    const default_ht_str = setInputBoxHorizontalAlignment(luckysheetConfigsetting);
+    const default_ht =  luckysheetConfigsetting.defaultHT;
+    const default_vt =  luckysheetConfigsetting.defaultVT;
+    const default_vt_str = setInputBoxVerticalAlignment(luckysheetConfigsetting);
     $("#luckysheet-input-box").removeAttr("style").css({ 
         "background-color": "rgb(255, 255, 255)", 
         "padding": "0px 2px", 
@@ -134,6 +139,8 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
         "overflow-y": "auto",
         "box-sizing": "initial",
         "display":"flex",
+        "text-align":default_ht_str,
+        "vertical-align":default_vt_str,
     });
 
     if(luckysheetFreezen.freezenverticaldata != null || luckysheetFreezen.freezenhorizontaldata != null){
@@ -150,47 +157,63 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
         let cell = d[row_index][col_index];
         let htValue = cell["ht"];
         let leftOrigin = "left", topOrigin = "top";
-        if(htValue == "0"){//0 center, 1 left, 2 right
+        if (!htValue){
+            const v = default_ht;
+            htValue = v;
+        }
+        if(htValue == "0"){ // 0 center
             input_postition = { 
                 "min-width": col - col_pre + 1- 8, 
                 "min-height": row - row_pre + 1- 4, 
-                // "transform":"scale("+ Store.zoomRatio +")",
-                // "transform-origin":"center top",
                 "max-width": winW*2/3, 
                 "max-height": winH + scrollTop - row_pre - 20 - 15 - Store.toolbarHeight - Store.infobarHeight - Store.calculatebarHeight - Store.sheetBarHeight - Store.statisticBarHeight, 
                 "left": col_pre + container_offset.left + Store.rowHeaderWidth - scrollLeft - 2, 
                 "top":  row_pre + container_offset.top + Store.infobarHeight + Store.toolbarHeight + Store.calculatebarHeight + Store.columnHeaderHeight - scrollTop - 2, 
             }
-
-            if(Store.zoomRatio<1){
+        
+            if(Store.zoomRatio < 1){
                 leftOrigin = "center";
             }
-
+        
             isCenter = true;
-        }
-        else if(htValue == "2"){
+        
+        } else if(htValue == "1"){ // 1 left
             input_postition = { 
-                "min-width": col - col_pre+ 1- 8, 
+                "min-width": col - col_pre + 1- 8, 
                 "min-height": row - row_pre + 1- 4, 
-                // "transform":"scale("+ Store.zoomRatio +")",
-                // "transform-origin":"right top",
+                "max-width": winW*2/3, 
+                "max-height": winH + scrollTop - row_pre - 20 - 15 - Store.toolbarHeight - Store.infobarHeight - Store.calculatebarHeight - Store.sheetBarHeight - Store.statisticBarHeight, 
+                "left": col_pre + container_offset.left + Store.rowHeaderWidth - scrollLeft - 2, 
+                "top":  row_pre + container_offset.top + Store.infobarHeight + Store.toolbarHeight + Store.calculatebarHeight + Store.columnHeaderHeight - scrollTop - 2, 
+            }
+        
+            if(Store.zoomRatio < 1){
+                leftOrigin = "left";
+            }
+        
+        } else if(htValue == "2"){ // 2 right
+            input_postition = { 
+                "min-width": col - col_pre + 1- 8, 
+                "min-height": row - row_pre + 1- 4, 
                 "max-width": col + container_offset.left - scrollLeft  - 8, 
                 "max-height": winH + scrollTop - row_pre - 20 - 15 - Store.toolbarHeight - Store.infobarHeight - Store.calculatebarHeight - Store.sheetBarHeight - Store.statisticBarHeight, 
                 "right": winW - (container_offset.left + (Store.rowHeaderWidth-1) - scrollLeft) - col, 
                 "top":  row_pre + container_offset.top + Store.infobarHeight + Store.toolbarHeight + Store.calculatebarHeight + Store.columnHeaderHeight - scrollTop - 2, 
             }
-
-            if(Store.zoomRatio<1){
+        
+            if(Store.zoomRatio < 1){
                 leftOrigin = "right";
             }
         }
-
+        
         if(cell["vt"]=="0"){
             topOrigin = "center";
-        }
-        else if(cell["vt"]=="2"){
+        } else if(cell["vt"]=="2"){
             topOrigin = "bottom";
+        }else{
+            topOrigin = "top";
         }
+        
 
         inputContentScale["transform-origin"] = leftOrigin +" " + topOrigin;
 

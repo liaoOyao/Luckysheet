@@ -5250,7 +5250,10 @@ const menuButton = {
         //交替颜色
         let af_compute = alternateformat.getComputeMap();
         let checksAF = alternateformat.checksAF(r, c, af_compute);
-
+        let must_exist_key_mapping={
+            "ht":false,
+            "vt":false,
+        };
         //条件格式
         let cf_compute = conditionformat.getComputeMap();
         let checksCF = conditionformat.checksCF(r, c, cf_compute);
@@ -5322,21 +5325,32 @@ const menuButton = {
                 }
             }
             // debugger;
-            if (key == "ht" && value != "1") {
+            if (key == "ht") {
+                must_exist_key_mapping[key] = true;
                 if (value == "0") {
                     style += "text-align: center;";
                 } else if (value == "2") {
                     style += "text-align: right;";
+                }else if (value == '1'){
+                    style += "text-align: left;";
+                }
+                else{
+                    const v = setInputBoxHorizontalAlignment(luckysheetConfigsetting);
+                    style += v;
                 }
             }
 
             if (key == "vt") {
+                must_exist_key_mapping[key] = false;
                 if (value == "0") {
                     style += "vertical-align: middle;";
                 } else if (value == "1") {
                     style += "vertical-align: top;";
                 } else if (value == "2") {
                     style += "vertical-align: bottom;";
+                }else{
+                    const v = setInputBoxVerticalAlignment(luckysheetConfigsetting);
+                    style += v;
                 }
             }
 
@@ -5349,6 +5363,20 @@ const menuButton = {
             style += getFontStyleByCell(cell, checksAF, checksCF);
         }
 
+        // 处理要根据默认配置设置的键
+        for (let key in must_exist_key_mapping) {
+            let value = must_exist_key_mapping[key];
+            if (!value){
+                if (key === 'ht'){
+                    const vh = setInputBoxHorizontalAlignment(luckysheetConfigsetting);
+                    style += "text-align:"+vh + ";";
+                }else if(key === 'vt'){
+                    const vv = setInputBoxVerticalAlignment(luckysheetConfigsetting);
+                    style += "vertical-align:"+ vv + ";";
+                }
+            }
+        }
+        debugger;
         return style;
     },
     fontSelectList: [],

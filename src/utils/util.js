@@ -490,8 +490,13 @@ function luckysheetactiveCell() {
             // need preventScroll:true,fix Luckysheet has been set top, and clicking the cell will trigger the scrolling problem
             const input = document.getElementById("luckysheet-rich-text-editor");
             input.focus({ preventScroll: true });
-            const v = setInputBoxHorizontalAlignment(luckysheetConfigsetting);
-            input.style.setProperty('text-align',v , 'important'); // 默认居中
+            // const default_text_align = input.style.textAlign;
+            // if (default_text_align ===''){
+            //     console.log("11设置了");
+            //     const v = setInputBoxHorizontalAlignment(luckysheetConfigsetting);
+            //     input.style.setProperty('text-align',v); // 默认居中
+            // }
+        
             // $("#luckysheet-rich-text-editor").focus().select();
         }, 50);
     }
