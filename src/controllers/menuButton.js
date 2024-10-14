@@ -4290,6 +4290,8 @@ const menuButton = {
                 itemvalue = "center";
             } else if (foucsStatus == "2") {
                 itemvalue = "right";
+            }else{
+                itemvalue = "left";
             }
 
             _this.focus($menuButton, itemvalue);
