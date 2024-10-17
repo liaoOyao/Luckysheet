@@ -39,7 +39,6 @@ import Store from "../store";
 import locale from "../locale/locale";
 import json from "./json";
 import method from "./method";
-import { has } from "browser-sync";
 
 const luckysheetformula = {
     error: {
