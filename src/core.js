@@ -141,7 +141,7 @@ luckysheet.create = function(setting) {
     luckysheetConfigsetting.show_select_count = extendsetting.show_select_count;
     luckysheetConfigsetting.defaultHT=extendsetting.defaultHT; // 水平对齐 0 居中、1 左、2右
     luckysheetConfigsetting.defaultVT=extendsetting.defaultVT;  // 垂直对齐  0 中间、1 上、2下
-
+    // luckysheetConfigsetting.defaultCellStyle=extendsetting.defaultCellStyle;  // 单元格没有设置属性时默认样式
     if (Store.lang === "zh") flatpickr.localize(Mandarin.zh);
 
     // Store the currently used plugins for monitoring asynchronous loading

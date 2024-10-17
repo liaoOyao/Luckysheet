@@ -44,6 +44,7 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
     //    14.
     //    15.
     //    16.
+    debugger;
     if(!checkProtectionLocked(row_index1, col_index1, Store.currentSheetIndex)){
         $("#luckysheet-functionbox-cell").blur();
         return;
@@ -219,6 +220,7 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
 
         
         if (!cover) {
+            debugger;
             if(isInlineStringCell(cell)){
                 value = getInlineStringStyle(row_index, col_index, d);
             }

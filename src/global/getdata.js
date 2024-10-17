@@ -9,7 +9,7 @@ import { isInlineStringCT,isInlineStringCell,convertCssToStyleList } from '../co
 import locale from '../locale/locale';
 import Store from '../store';
 import luckysheetConfigsetting from "../controllers/luckysheetConfigsetting";
-
+import defaultConfig from '../config';
 //Get selection range value
 export function getdatabyselection(range, sheetIndex) {
     if(range == null){
@@ -305,12 +305,15 @@ export function getInlineStringNoStyle(r, c){
 }
 
 export function getInlineStringStyle(r, c, data){
+    debugger;
     let ct = getcellvalue(r, c, data, "ct");
     if (data == null) {
         data = Store.flowdata;
     }
     let cell = data[r][c];
+
     if(isInlineStringCT(ct)){
+        debugger;
         let strings = ct.s, value="";
         for(let i=0;i<strings.length;i++){
             let strObj = strings[i];
@@ -324,21 +327,41 @@ export function getInlineStringStyle(r, c, data){
 
     return "";
 }
-
+export function default_cell_style(cell, style){
+    /**
+     * 如果某些key 没有在单元格属性中会被其他样式影响从而导致单元格默认属性不对
+     * 现在修复这些单元格中没有的属性为默认值
+     */
+    const defaultCellStyle = defaultConfig.defaultCellStyle;
+    for (let key in defaultCellStyle) {
+        debugger;
+       if (!(key  in cell)){
+        const style_temp_list = defaultCellStyle[key];
+        style +=  style_temp_list[0] +":"+ style_temp_list[1] +";";
+       }
+    }
+    return style;
+}
 export function getFontStyleByCell(cell,checksAF,checksCF, isCheck=true){
     if(cell==null){
         return;
     }
     let style = "";
+    debugger;
     const _locale = locale();
     const locale_fontarray = _locale.fontarray;
     for(let key in cell){
+        debugger;
         let value = cell[key];
         if(isCheck){
             value = checkstatusByCell(cell, key);
         }
-        if(key == "bl" && value != "0"){
-            style += "font-weight: bold;";
+        if(key == "bl"){
+            if(value != "0"){
+                style += "font-weight: bold;";
+            }else{
+                style += "font-weight: normal;";
+            }
         }
 
         if(key == "it" && value != "0"){
@@ -377,10 +400,13 @@ export function getFontStyleByCell(cell,checksAF,checksCF, isCheck=true){
         }
 
     }
+    debugger;
+    style = default_cell_style(cell, style);
     return style;
 }
 
 export function checkstatusByCell(cell, a){
+    debugger;
     let foucsStatus =cell;
     let tf = {"bl":1, "it":1 , "ff":1, "cl":1, "un":1};
 

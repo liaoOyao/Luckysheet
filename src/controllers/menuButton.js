@@ -2919,6 +2919,7 @@ const menuButton = {
                 e.stopPropagation();
             })
             .click(function(e) {
+                debugger;
                 let d = editor.deepCopyFlowData(Store.flowdata);
 
                 let flag = checkTheStatusOfTheSelectedCells("bl", 1);
@@ -3900,6 +3901,8 @@ const menuButton = {
         }
     },
     updateFormat: function(d, attr, foucsStatus) {
+        debugger;
+        console.log("updateFormat", d, attr, foucsStatus);
         let _this = this;
 
         if (!checkProtectionFormatCells(Store.currentSheetIndex)) {
