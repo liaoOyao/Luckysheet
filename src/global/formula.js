@@ -1585,7 +1585,8 @@ const luckysheetformula = {
                      v: ''  // 文本内容
                  };
                  let pre_child_type, now_child_type = null; // 如果前一个是文本 ，则标记为 1, 是否标签则为0，初始则为null
-                 let different_content = false;
+                let ignoreFirstNewline = true; // 新增标志，用于记录上一个换行符
+
                  children.forEach(child => {
                     debugger;
                     let add_flag = false;
@@ -1626,17 +1627,20 @@ const luckysheetformula = {
             
                  if (text_content != '\n') {
                     const s_len = curv.ct.s.length;
-                    if (index < s_len) {
-                        let s_item_obj = curv.ct.s[my_index];
-                        if (!s_item_obj.hasOwnProperty("bl")) {
-                            curv.ct.s[my_index].bl = currentStyle.bl; // 加粗
-                        }
-                        if (!s_item_obj.hasOwnProperty("it")) {
-                            curv.ct.s[my_index].it = currentStyle.it; // 斜体
-                        }
-                        if (!s_item_obj.hasOwnProperty("un")) {
-                            curv.ct.s[my_index].un = currentStyle.un; // 下划线
-                        }
+                    if (my_index < s_len) {
+                        // let s_item_obj = curv.ct.s[my_index];
+                        curv.ct.s[my_index].bl = currentStyle.bl; // 加粗
+                        curv.ct.s[my_index].it = currentStyle.it; // 斜体
+                        curv.ct.s[my_index].un = currentStyle.un; // 下划线
+                        // if (!s_item_obj.hasOwnProperty("bl")) {
+                        //     curv.ct.s[my_index].bl = currentStyle.bl; // 加粗
+                        // }
+                        // if (!s_item_obj.hasOwnProperty("it")) {
+                        //     curv.ct.s[my_index].it = currentStyle.it; // 斜体
+                        // }
+                        // if (!s_item_obj.hasOwnProperty("un")) {
+                        //     curv.ct.s[my_index].un = currentStyle.un; // 下划线
+                        // }
                     }
                     my_index++;
                 }

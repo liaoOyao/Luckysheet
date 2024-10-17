@@ -349,36 +349,48 @@ export function updateInlineStringFormatOutside(cell, key, value) {
         item[key] = value;
     }
 }
-export function convertSpanToShareList($dom) { // hz_flag add
+export function convertSpanToShareList($dom) { // hz_flag add 
     let styles = [];
     let preStyleList = null;
     let preStyleListString = null;
     const dom_len = $dom.length;
+    debugger;
     for (let i = 0; i < dom_len; i++) {
-        debugger;
         let span = $dom.get(i);
         let styleList = convertCssToStyleList(span.style.cssText);
 
         let curStyleListString = JSON.stringify(styleList);
         let v = span.innerText.replace(/\r\n/g, "\n"); // 先将 \r\n 统一替换为 \n
         let lines = v.split('\n'); // 按换行符分割成多行
+        debugger;
 
         const len_lines = lines.length;
+        let ignoreFirstNewline = true; // 新增标志，用于忽略第一个换行符
+
         for (let index = 0; index < len_lines; index++) {
             let line = lines[index];
-            if (line.trim() === '') {
-                // 空行，不处理
-                continue;
+            debugger;
+            // 处理非空行
+            if (line.trim() !== '') {
+                const styleList_temp = JSON.parse(JSON.stringify(styleList)); // 深拷贝样式对象
+                styleList_temp.v = line + "\r\n"; // 除最后一行外，其他行末尾加上 \r\n
+                styles.push(styleList_temp); // 将当前样式及文本加入数组
+                preStyleListString = curStyleListString; // 更新前一个样式字符串
+                preStyleList = styleList_temp; // 更新前一个样式列表
+            } else {
+                // 处理空行
+                if (!ignoreFirstNewline) { // 只有在第一个换行符之后才处理空行
+                    const styleList_temp = JSON.parse(JSON.stringify(styleList)); // 深拷贝样式对象
+                    styleList_temp.v = "\r\n"; // 空行用 \r\n 表示
+                    styles.push(styleList_temp); // 将空行样式加入数组
+                    ignoreFirstNewline = true;  // 抵消一次空白行后恢复
+                }else{
+                    ignoreFirstNewline = false;  // 抵消一次空白行后恢复
+                }
             }
-
-            const styleList_temp = JSON.parse(JSON.stringify(styleList)); // 深拷贝样式对象
-            line += "\r\n"; // 除最后一行外，其他行末尾加上 \r\n
-            styleList_temp.v = line;
-            styles.push(styleList_temp); // 将当前样式及文本加入数组
-            preStyleListString = curStyleListString; // 更新前一个样式字符串
-            preStyleList = styleList_temp; // 更新前一个样式列表
         }
     }
+
     // 删除最后一个换行符 \r\n
     const len_styles = styles.length;
     if (len_styles > 0) {
