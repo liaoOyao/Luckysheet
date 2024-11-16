@@ -403,23 +403,30 @@ function jfrefreshgrid_adRC(data, cfg, ctrlType, ctrlValue, calc, filterObj, cf,
     collaborativeEditBox();
     //merge改变对应的单元格值改变
     let mcData = [];
-    for(let m in cfg["merge"]){
+    for (let m in cfg["merge"]) {
         let mc = cfg["merge"][m];
 
-        for(let r = mc.r; r <= mc.r + mc.rs - 1; r++){
-            for(let c = mc.c; c <= mc.c + mc.cs - 1; c++){
-                if(data[r][c] == null){
-                    data[r][c] = {};
+        for (let r = mc.r; r <= mc.r + mc.rs - 1; r++) {
+            // 检查 data[r] 是否存在
+            if ( typeof r === 'undefined' || r === null || !data[r]) {
+                console.warn(`Row ${r} does not exist in data, skipping.`);
+                continue;
+            }
+
+            for (let c = mc.c; c <= mc.c + mc.cs - 1; c++) {
+                // 检查 data[r][c] 是否存在
+                if (typeof r === 'undefined' || r === null || !data[r][c]) {
+                    console.warn(`Cell [${r}][${c}] does not exist in data, skipping.`);
+                    continue;
                 }
 
-                if(r == mc.r && c == mc.c){
+                if (r == mc.r && c == mc.c) {
                     data[r][c].mc = mc;
-                }
-                else{
+                } else {
                     data[r][c].mc = { "r": mc.r, "c": mc.c };
                 }
 
-                mcData.push({ "r": r, "c": c });                       
+                mcData.push({ "r": r, "c": c });
             }
         }
     }

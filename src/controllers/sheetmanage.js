@@ -1222,26 +1222,46 @@ const sheetmanage = {
             let c = parseInt(x.substr(x.indexOf("_") + 1));
             let mcInfo = mergeConfig[x];
             console.log(r, c);
-            if (data){
-                if (data[r][c] == null) {
-                    data[r][c] = {};
+        
+            if (data) {
+                // 如果 data[r] 不存在，跳过
+                if (!data[r]) {
+                    console.warn(`Row ${r} does not exist in data, skipping.`);
+                    continue;
                 }
-    
+        
+                // 如果 data[r][c] 不存在，跳过
+                if (!data[r][c]) {
+                    console.warn(`Cell [${r}][${c}] does not exist in data, skipping.`);
+                    continue;
+                }
+        
                 data[r][c]["mc"] = {
                     r: r,
                     c: c,
                     rs: mcInfo.rs,
                     cs: mcInfo.cs,
                 };
-    
+        
                 for (let ir = r; ir < r + mcInfo.rs; ir++) {
+                    // 如果 data[ir] 不存在，跳过
+                    if (!data[ir]) {
+                        console.warn(`Row ${ir} does not exist in data, skipping inner rows.`);
+                        continue;
+                    }
+        
                     for (let ic = c; ic < c + mcInfo.cs; ic++) {
+                        // 如果是原始单元格，跳过
                         if (ir == r && ic == c) {
                             continue;
                         }
-                        if (data[ir][ic] == null) {
-                            data[ir][ic] = {};
+        
+                        // 如果 data[ir][ic] 不存在，跳过
+                        if (!data[ir][ic]) {
+                            console.warn(`Cell [${ir}][${ic}] does not exist in data, skipping.`);
+                            continue;
                         }
+        
                         data[ir][ic]["mc"] = {
                             r: r,
                             c: c,
@@ -1249,8 +1269,8 @@ const sheetmanage = {
                     }
                 }
             }
- 
         }
+        
     },
     loadOtherFile: function(file) {
         let _this = this;
