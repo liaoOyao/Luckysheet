@@ -5376,7 +5376,6 @@ const menuButton = {
                 }
             }
         }
-        debugger;
         return style;
     },
     fontSelectList: [],
