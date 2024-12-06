@@ -1368,15 +1368,15 @@ export default function luckysheetHandler() {
                         }
                     }
 
-                    // if (isSame) {
-                    //     $("#luckysheet-cols-rows-add")
-                    //         .find("input[type='number'].rcsize")
-                    //         .val(first_collen);
-                    // } else {
-                    //     $("#luckysheet-cols-rows-add")
-                    //         .find("input[type='number'].rcsize")
-                    //         .val("");
-                    // }
+                    if (isSame) {
+                        $("#luckysheet-cols-rows-add")
+                            .find("input[type='number'].rcsize")
+                            .val(first_collen);
+                    } else {
+                        $("#luckysheet-cols-rows-add")
+                            .find("input[type='number'].rcsize")
+                            .val("");
+                    }
                 } else if (
                     obj_s["column"] != null &&
                     obj_s["column"][0] == 0 &&
@@ -1582,7 +1582,7 @@ export default function luckysheetHandler() {
             if (parseInt($("#luckysheet-input-box").css("top")) > 0) {
                 return;
             }
-
+            debugger;
             let mouse = mouseposition(event.pageX, event.pageY);
             if (
                 mouse[0] >= Store.cellmainWidth - Store.cellMainSrollBarSize ||
@@ -3994,7 +3994,7 @@ export default function luckysheetHandler() {
             $("#luckysheet-sheets-item-clone").remove();
             Store.luckysheet_sheet_move_data.cursorobject.css({ cursor: "pointer" });
             Store.luckysheet_sheet_move_data = {};
-            sheetmanage.reOrderAllSheet('drag_move'); // hz_falg
+            sheetmanage.reOrderAllSheet(); // hz_falg
         }
 
         // chart move debounce timer clear

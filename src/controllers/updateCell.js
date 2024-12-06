@@ -103,7 +103,7 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
     if(luckysheetFreezen.freezenhorizontaldata != null && row_index1 <= luckysheetFreezen.freezenhorizontaldata[1]){
         top = row_pre + container_offset.top + Store.infobarHeight + Store.toolbarHeight + Store.calculatebarHeight + Store.columnHeaderHeight - 2;
     }
-
+    debugger;
     // 获取input 位置，计算input内容的尺寸
     let input_postition = {
         "min-width": col - col_pre+ 1- 8, 
@@ -162,14 +162,14 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
             htValue = v;
         }
         if(htValue == "0"){ // 0 center
-            input_postition = { 
-                "min-width": col - col_pre + 1- 8, 
-                "min-height": row - row_pre + 1- 4, 
-                "max-width": winW*2/3, 
-                "max-height": winH + scrollTop - row_pre - 20 - 15 - Store.toolbarHeight - Store.infobarHeight - Store.calculatebarHeight - Store.sheetBarHeight - Store.statisticBarHeight, 
-                "left": col_pre + container_offset.left + Store.rowHeaderWidth - scrollLeft - 2, 
-                "top":  row_pre + container_offset.top + Store.infobarHeight + Store.toolbarHeight + Store.calculatebarHeight + Store.columnHeaderHeight - scrollTop - 2, 
-            }
+            // input_postition = { 
+            //     "min-width": col - col_pre + 1- 8, 
+            //     "min-height": row - row_pre + 1- 4, 
+            //     "max-width": winW*2/3, 
+            //     "max-height": winH + scrollTop - row_pre - 20 - 15 - Store.toolbarHeight - Store.infobarHeight - Store.calculatebarHeight - Store.sheetBarHeight - Store.statisticBarHeight, 
+            //     "left": col_pre + container_offset.left + Store.rowHeaderWidth - scrollLeft - 2, 
+            //     "top":  row_pre + container_offset.top + Store.infobarHeight + Store.toolbarHeight + Store.calculatebarHeight + Store.columnHeaderHeight - scrollTop - 2, 
+            // }
         
             if(Store.zoomRatio < 1){
                 leftOrigin = "center";
@@ -178,28 +178,28 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
             isCenter = true;
         
         } else if(htValue == "1"){ // 1 left
-            input_postition = { 
-                "min-width": col - col_pre + 1- 8, 
-                "min-height": row - row_pre + 1- 4, 
-                "max-width": winW*2/3, 
-                "max-height": winH + scrollTop - row_pre - 20 - 15 - Store.toolbarHeight - Store.infobarHeight - Store.calculatebarHeight - Store.sheetBarHeight - Store.statisticBarHeight, 
-                "left": col_pre + container_offset.left + Store.rowHeaderWidth - scrollLeft - 2, 
-                "top":  row_pre + container_offset.top + Store.infobarHeight + Store.toolbarHeight + Store.calculatebarHeight + Store.columnHeaderHeight - scrollTop - 2, 
-            }
+            // input_postition = { 
+            //     "min-width": col - col_pre + 1- 8, 
+            //     "min-height": row - row_pre + 1- 4, 
+            //     "max-width": winW*2/3, 
+            //     "max-height": winH + scrollTop - row_pre - 20 - 15 - Store.toolbarHeight - Store.infobarHeight - Store.calculatebarHeight - Store.sheetBarHeight - Store.statisticBarHeight, 
+            //     "left": col_pre + container_offset.left + Store.rowHeaderWidth - scrollLeft - 2, 
+            //     "top":  row_pre + container_offset.top + Store.infobarHeight + Store.toolbarHeight + Store.calculatebarHeight + Store.columnHeaderHeight - scrollTop - 2, 
+            // }
         
             if(Store.zoomRatio < 1){
                 leftOrigin = "left";
             }
         
         } else if(htValue == "2"){ // 2 right
-            input_postition = { 
-                "min-width": col - col_pre + 1- 8, 
-                "min-height": row - row_pre + 1- 4, 
-                "max-width": col + container_offset.left - scrollLeft  - 8, 
-                "max-height": winH + scrollTop - row_pre - 20 - 15 - Store.toolbarHeight - Store.infobarHeight - Store.calculatebarHeight - Store.sheetBarHeight - Store.statisticBarHeight, 
-                "right": winW - (container_offset.left + (Store.rowHeaderWidth-1) - scrollLeft) - col, 
-                "top":  row_pre + container_offset.top + Store.infobarHeight + Store.toolbarHeight + Store.calculatebarHeight + Store.columnHeaderHeight - scrollTop - 2, 
-            }
+            // input_postition = { 
+            //     "min-width": col - col_pre + 1- 8, 
+            //     "min-height": row - row_pre + 1- 4, 
+            //     "max-width": col + container_offset.left - scrollLeft  - 8, 
+            //     "max-height": winH + scrollTop - row_pre - 20 - 15 - Store.toolbarHeight - Store.infobarHeight - Store.calculatebarHeight - Store.sheetBarHeight - Store.statisticBarHeight, 
+            //     "right": winW - (container_offset.left + (Store.rowHeaderWidth-1) - scrollLeft) - col, 
+            //     "top":  row_pre + container_offset.top + Store.infobarHeight + Store.toolbarHeight + Store.calculatebarHeight + Store.columnHeaderHeight - scrollTop - 2, 
+            // }
         
             if(Store.zoomRatio < 1){
                 leftOrigin = "right";
