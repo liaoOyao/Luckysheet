@@ -6299,7 +6299,6 @@ export default function luckysheetHandler() {
                                  
 
                                         // td_contain_tag =  false; 用来标识和处理  <p><span style='font-family:微软雅黑;font-size:18pt;font-weight:bold;color:#ffffff'>序号</span > < /p> 这种情况
-                                        console.log(($(this).children().length));
                                         if (this.nodeType == 1 && ($(this).children().length === 1) ){ // 其中$(this).children().length是判断它的孩子而不是孩子的下一代
                                             // 跳过包含标签的文本节点
                                             td_contain_tag = true;

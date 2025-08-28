@@ -1622,7 +1622,7 @@ const luckysheetformula = {
             }
         }
         // value maybe an object
-        console.log(editor.deepCopyFlowData(Store.flowdata),"刷新的")
+        // console.log(editor.deepCopyFlowData(Store.flowdata),"刷新的")
         setcellvalue(r, c, d, value);
         _this.cancelNormalSelected();
 
@@ -5025,7 +5025,6 @@ const luckysheetformula = {
 
             i++;
         }
-        // console.log(function_str);
         _this.checkSpecialFunctionRange(function_str, r, c, index, dynamicArray_compute, cellRangeFunction);
         return function_str;
     },
@@ -5107,7 +5106,6 @@ const luckysheetformula = {
                     str = str.startCell;
                 }
                 let str_nb = $.trim(str);
-                // console.log(function_str, tempFunc,str, this.iscelldata(str_nb),this.isFunctionRangeSave,r,c);
                 if (this.iscelldata(str_nb)) {
                     if (typeof cellRangeFunction == "function") {
                         cellRangeFunction(str_nb);
@@ -5213,8 +5211,6 @@ const luckysheetformula = {
         } else {
             this.cellTextToIndexList[txt + "_" + infoObj.sheetIndex] = infoObj;
         }
-
-        // console.log(this.cellTextToIndexList);
     },
     addToSheetIndexList: function(formulaTxt, sheetIndex, obIndex) {
         if (formulaTxt == null || formulaTxt.length == 0) {
