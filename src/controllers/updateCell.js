@@ -103,7 +103,6 @@ export function luckysheetupdateCell(row_index1, col_index1, d, cover, isnotfocu
     if(luckysheetFreezen.freezenhorizontaldata != null && row_index1 <= luckysheetFreezen.freezenhorizontaldata[1]){
         top = row_pre + container_offset.top + Store.infobarHeight + Store.toolbarHeight + Store.calculatebarHeight + Store.columnHeaderHeight - 2;
     }
-    debugger;
     // 获取input 位置，计算input内容的尺寸
     let input_postition = {
         "min-width": col - col_pre+ 1- 8, 

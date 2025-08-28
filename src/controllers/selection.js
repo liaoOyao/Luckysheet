@@ -565,7 +565,6 @@ const selection = {
         if (!clipboardData) {
             let textarea = $("#luckysheet-copy-content");
             textarea.html(cpdata);
-            console.log(textarea);
             textarea.focus();
             textarea.select();
             document.execCommand("selectAll");

@@ -1582,7 +1582,6 @@ export default function luckysheetHandler() {
             if (parseInt($("#luckysheet-input-box").css("top")) > 0) {
                 return;
             }
-            debugger;
             let mouse = mouseposition(event.pageX, event.pageY);
             if (
                 mouse[0] >= Store.cellmainWidth - Store.cellMainSrollBarSize ||
@@ -5966,7 +5965,7 @@ export default function luckysheetHandler() {
             }
 
             let txtdata = clipboardData.getData("text/html") || clipboardData.getData("text/plain");
-            console.log(txtdata); // hz_flag debugger1
+            // console.log(txtdata); // hz_flag debugger1
 
             // navigator.clipboard.writeText(txtdata) // hz_flag
             // .then(() => {

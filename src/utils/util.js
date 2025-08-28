@@ -492,7 +492,6 @@ function luckysheetactiveCell() {
             input.focus({ preventScroll: true });
             // const default_text_align = input.style.textAlign;
             // if (default_text_align ===''){
-            //     console.log("11设置了");
             //     const v = setInputBoxHorizontalAlignment(luckysheetConfigsetting);
             //     input.style.setProperty('text-align',v); // 默认居中
             // }

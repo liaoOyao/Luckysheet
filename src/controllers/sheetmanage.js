@@ -1202,7 +1202,6 @@ const sheetmanage = {
     },
     mergeCalculationSheet: {},
     mergeCalculation: function(index) {
-        console.log("index_my", this.getSheetIndex(index));
         let file = Store.luckysheetfile[this.getSheetIndex(index)];
         let config = file.config,
             data = file.data;
@@ -1215,13 +1214,10 @@ const sheetmanage = {
         }
 
         this.mergeCalculationSheet[index] = 1;
-        console.log(mergeConfig);
-        console.log(data);
         for (let x in mergeConfig) {
             let r = parseInt(x.substr(0, x.indexOf("_")));
             let c = parseInt(x.substr(x.indexOf("_") + 1));
             let mcInfo = mergeConfig[x];
-            console.log(r, c);
         
             if (data) {
                 // 如果 data[r] 不存在，跳过

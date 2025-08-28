@@ -691,8 +691,7 @@ function luckysheetextendtable(type, index, value, direction, sheetIndex) {
         }
     } else {
         type1 = "c";
-
-        //行高配置变动
+        //hz_flag 列宽配置变动
         if (cfg["columnlen"] != null) {
             let columnlen_new = {};
 

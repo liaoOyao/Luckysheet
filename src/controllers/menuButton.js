@@ -4594,10 +4594,6 @@ const menuButton = {
                 let col_rs = d[row_index][col_index].mc.cs;
             }catch (e) {
                 // 没有时说明data 里面没有，那么从config 里面获取即可
-                console.log(d[row_index][col_index]);
-                console.log(row_index);
-                console.log(col_index);
-                console.log(e);
                 return null;
             }
 

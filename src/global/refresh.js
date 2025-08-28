@@ -545,7 +545,6 @@ function jfrefreshgrid_adRC(data, cfg, ctrlType, ctrlValue, calc, filterObj, cf,
     Store.flowdata = data;
     editor.webWorkerFlowDataCache(Store.flowdata);//worker存数据
     file.data = data;
-    console.log(Store, file);
     //config
     Store.config = cfg;
     file.config = Store.config;
@@ -629,7 +628,6 @@ function jfrefreshgrid_adRC(data, cfg, ctrlType, ctrlValue, calc, filterObj, cf,
     hyperlinkCtrl.hyperlink = hyperlink;
     file.hyperlink = hyperlink;
     server.saveParam("all", Store.currentSheetIndex, file.hyperlink, { "k": "hyperlink" });
-    console.log(Store, file);
     //行高、列宽刷新  hz_flag
     common_handel_row_col_all_deleted(Store,file);
     jfrefreshgrid_rhcw(Store.flowdata.length, Store.flowdata[0].length);

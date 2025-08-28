@@ -1046,7 +1046,6 @@ function createLuckyChart(width, height, left, top) {
     for (var r = jfgird_select_save[0]["row"][0]; r <= jfgird_select_save[0]["row"][1]; r++) {
         for (var c = jfgird_select_save[0]["column"][0]; c <= jfgird_select_save[0]["column"][1]; c++) {
             var value = getcellvalue(r, c, luckysheet.flowdata());
-            //console.log("value,r,c",value,r,c);
             if (value != null && value.toString().length > 0) {
                 shiftpositon_row = r;
                 break;

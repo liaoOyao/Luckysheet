@@ -910,7 +910,6 @@ const conditionformat = {
 
                     //条件值
                     let v = $("#luckysheet-editorConditionRule-dialog #formulaConditionVal input").val().trim(); 
-                    console.log(v)
                     if(v == ""){
                         _this.infoDialog("Condition value cannot be empty!", "");
                         return;
