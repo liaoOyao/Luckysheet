@@ -42,7 +42,8 @@
     "flatpickr": "^4.6.6",
     "jquery": "^2.2.4",
     "numeral": "^2.0.6",
-    "pako": "^1.0.11"
+    "pako": "^1.0.11",
+    "uuid": "file:src/uuid-8.3.2.tgz"
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production gulp build",
